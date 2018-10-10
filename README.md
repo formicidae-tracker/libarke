@@ -1,5 +1,4 @@
-# FORT - libarke - Electronic Device Communication Protocol
+# FORT - Electronic Device Communication Protocol Implementation - libarke
 
-
-This repository holds specifications, device and host (PC) code to
-deal with the communication of the FORmicidae Tracler project.
+This repository holds specifications, device (AVR) and host (Linux)
+implementation of the FORmicidae Device Communication Protocol.
