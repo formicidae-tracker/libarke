@@ -10,7 +10,7 @@ typedef enum ArkeMessageType_e {
 	ARKE_HIGH_PRIORITY_MESSAGE = 0x01,
 	ARKE_MESSAGE = 0x02,
 	ARKE_HEARTBEAT = 0x03,
-	ARKE_MESSAGE_TYPE_MASK = 0x03 << 8
+	ARKE_MESSAGE_TYPE_MASK = 0x03 << 9
 } ArkeMessageType;
 
 typedef enum ArkeNodeClass_e {
