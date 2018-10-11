@@ -2,7 +2,7 @@
 
 
 #include "arke.h"
-
+#include "yaacl.h"
 
 #include "inttypes.h"
 
@@ -28,3 +28,20 @@ void ArkeSoftwareReset();
 		MCUSR = 0; \
 		wdt_disable(); \
 	}
+
+
+#define ARKE_DECLARE_SENDER_FUNCTION(name) \
+	yaacl_error_e ArkeSend ## name(yaacl_txn_t * txn,bool rtr, bool emergency, uint8_t subID,const Arke ## name * data)
+
+ARKE_DECLARE_SENDER_FUNCTION(ZeusSetPoint);
+ARKE_DECLARE_SENDER_FUNCTION(ZeusReport);
+ARKE_DECLARE_SENDER_FUNCTION(HeliosSetPoint);
+ARKE_DECLARE_SENDER_FUNCTION(CelaenoSetPoint);
+ARKE_DECLARE_SENDER_FUNCTION(CelaenoStatus);
+
+#define ArkeZeusSetPointClassValue ARKE_ZEUS_SET_POINT
+#define ArkeZeusReportClassValue ARKE_ZEUS_REPORT
+#define ArkeHeliosSetPointClassValue ARKE_HELIOS_SET_POINT
+#define ArkeCelaenoSetPointClassValue ARKE_CELAENO_SET_POINT
+#define ArkeCelaenoStatusClassValue   ARKE_CELAENO_STATUS
+#define ARKE_MESSAGE_STRUCT_TO_CLASS(name) ( name ## ClassValue)

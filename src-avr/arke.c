@@ -139,3 +139,23 @@ void ArkeProcess() {
 		arke.lastHeartbeat = now;
 	}
 }
+
+
+#define implement_sender_function(name) \
+	ARKE_DECLARE_SENDER_FUNCTION(name) { \
+		txn->ID = subID \
+			+ ( Arke ## name ## ClassValue << 3) \
+			+ (emergency ? (ARKE_HIGH_PRIORITY_MESSAGE << 9) : ARKE_MESSAGE); \
+		if (rtr) { \
+			txn->ID |= YAACL_RTRBIT_MSK; \
+		} \
+		txn->length = sizeof(Arke ## name); \
+		txn->data = (uint8_t*)data; \
+		return yaacl_send(txn); \
+	}
+
+implement_sender_function(ZeusSetPoint)
+implement_sender_function(ZeusReport)
+implement_sender_function(HeliosSetPoint)
+implement_sender_function(CelaenoSetPoint)
+implement_sender_function(CelaenoStatus)

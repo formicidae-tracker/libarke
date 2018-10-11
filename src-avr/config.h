@@ -1,8 +1,8 @@
 #pragma once
 
-#if defined(__AVR_ATmega16m1__) \
-	|| defined(__AVR_ATmega32m1__) \
-	|| defined(__AVR_ATmega64m1__)
+#if defined(__AVR_ATmega16M1__) \
+	|| defined(__AVR_ATmega32M1__) \
+	|| defined(__AVR_ATmega64M1__)
 #define START_TIMER0_1ms() do{	  \
 		TCCR0A = _BV(WGM01); \
 		TCCR0B = _BV(CS01) | _BV(CS00); \
