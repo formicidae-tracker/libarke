@@ -2,7 +2,7 @@
 
 #include <yaacl.h>
 
-#define software_reset() do{}while(0)
+
 
 #if defined(ARKE_MY_FW_TWEAK_VERSION)
 #define VERSION_LENGTH 4
@@ -73,7 +73,7 @@ void ProcessControl() {
 	// we are forbidden to access any yaacl function here
 
 	if ( command == ARKE_RESET_REQUEST ) {
-		software_reset();
+		ArkeSoftwareReset();
 	}
 
 	if ( command == ARKE_HEARTBEAT_REQUEST ) {
