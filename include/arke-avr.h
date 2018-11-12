@@ -1,14 +1,11 @@
 #pragma once
 
 
-#include "arke.h"
+#include "arke-avr/systime.h"
+#include <arke.h>
 #include "yaacl.h"
 
 #include "inttypes.h"
-
-typedef uint16_t ArkeSystime_t;
-
-ArkeSystime_t ArkeGetSystime();
 
 void InitArke();
 

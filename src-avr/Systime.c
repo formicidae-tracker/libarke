@@ -1,4 +1,4 @@
-#include "arke-avr.h"
+#include "arke-avr/systime.h"
 
 
 #include <avr/io.h>
@@ -7,7 +7,6 @@
 #include "config.h"
 
 volatile ArkeSystime_t systime;
-
 
 void ArkeInitSystime() {
 	systime = 0;
