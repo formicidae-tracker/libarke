@@ -87,6 +87,7 @@ void ProcessControl() {
 			arke.lastHeartbeat = ArkeGetSystime();
 			arke.heartbeatStatus = HEARTBEAT_ONCE;
 		} else if ( dataLength == 2 ) {
+
 			*(((uint8_t*)(&arke.heartbeatPeriod)) + 0) = arke.controlData[0];
 			*(((uint8_t*)(&arke.heartbeatPeriod)) + 1) = arke.controlData[1];
 			arke.lastHeartbeat = ArkeGetSystime();
@@ -110,7 +111,7 @@ void ArkeProcess() {
 	if ( s != YAACL_TXN_PENDING ) {
 		// we received or had an error, we re-listen
 		arke.control.length = 8;
-		yaacl_listen(&arke.control);
+		yaacl_listen(&(arke.control));
 	}
 
 	// heartbeat
