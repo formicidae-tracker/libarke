@@ -52,8 +52,8 @@ message according to the following table :
 |        Bits Value | Message Class                           | Node Permission        |
 |------------------:|:----------------------------------------|:-----------------------|
 |              0b00 | Network Control Command                 |           Receive Only |
-|              0b01 | High Priority Message (error, emergency)| Emission and Reception |
-|              0b10 | Standard Protoity Messages              | Emission and Reception |
+|              0b01 | High Priority Message (error, emergency)|          Emission Only |
+|              0b10 | Standard Priority Messages              | Emission and Reception |
 |              0b11 | Heartbeat message                       |          Emission Only |
 
 Except for control messages the following 9 bit are subdivided in two
@@ -92,17 +92,16 @@ This table gives all message categories that could be found on the bus.
 
 | Message Category | Name                                          | Node         | Node Class ID (without subID) |
 |-----------------:|:----------------------------------------------|:-------------|:------------------------------|
-|             0x00 | Reserved for broadcast                        | none and all | n.a.                          |
-|             0x01 | Zeus Temperature and Humidity Periodic Report | Zeus         | 0x01                          |
-|             0x02 | Zeus Temperature and Humidity Set Point       | Zeus         | 0x01                          |
-|        0x03-0x08 | Reserved                                      | Zeus         | 0x01                          |
-|             0x09 | Helios Illumination Set Point                 | Helios       | 0x09                          |
-|        0x0a-0x0c | Reserved                                      | Helios       | 0x09                          |
-|             0x0d | Celaeno Humidity Production Set Point         | Celaeno      | 0x0d                          |
-|             0x0e | Celaeno Water Level Status                    | Celaeno      | 0x0d                          |
-|        0x0f-0x10 | Reserved                                      | Celaeno      | 0x0d                          |
-|        0x11-0x3f | For future use                                | n.a          | n.a                           |
-
+|        0x3a-0x3f | Reserved (Zeus)                               | Zeus         | 0x38                          |
+|             0x39 | Zeus Temperature and Humidity Report          | Zeus         | 0x38                          |
+|             0x38 | Zeus Temperature and Humidity Set Poiny       | Zeus         | 0x38                          |
+|        0x35-0x37 | Reserved (Helios)                             | Helios       | 0x34                          |
+|             0x34 | Helios Illumination Set Point                 | Helios       | 0x34                          |
+|        0x32-0x33 | Reserved (Celaeno)                            | Celaeno      | 0x30                          |
+|             0x31 | Celaeno Set Point                             | Celaeno      | 0x30                          |
+|             0x30 | Celaeno Status                                | Celaeno      | 0x30                          |
+|        0x04-0x29 | For future use                                | n.a          | n.a                           |
+|             0x00 | Reserved for broadcast                        | all          | n.a.                          |
 Any of this messages can be sent using low (0b10) and high (0b01)
 priority.
 
@@ -111,9 +110,9 @@ available :
 
 | Node Name | Device Class ID |
 |----------:|:----------------|
-|      Zeus | 0x01            |
-|    Helios | 0x09            |
-|   Celaeno | 0x0d            |
+|      Zeus | 0x38            |
+|    Helios | 0x34            |
+|   Celaeno | 0x30            |
 
 For all messages, the host can use a RTR request on the device to
 actively fetch the data if he requires it and this data is not sent
@@ -121,7 +120,7 @@ periodically.
 
 ## Message Specifications.
 
-#### 0x01 Zeus Temperature and Humidity Report
+#### 0x39 Zeus Temperature and Humidity Report
 
 * Access :  Read Only
 * Periodically emitted by node : yes (frequency not yet determined)
@@ -131,7 +130,7 @@ periodically.
   * Data Fields: to be determined.
 
 
-#### 0x02 Zeus Temperature and Humidity Set Point
+#### 0x38 Zeus Temperature and Humidity Set Point
 
 * Access :  Read/Write
 * Periodically emitted by node : never
@@ -140,7 +139,7 @@ periodically.
   * Data fields: to be determined.
 
 
-#### 0x09 Helios Illumination Set Point
+#### 0x34 Helios Illumination Set Point
 
 * Access :  Read/Write
 * Periodically emitted by node : never
@@ -151,10 +150,10 @@ periodically.
 	* Byte 1: UV Light Level
 
 Note, unstar the previous system, the infrared light pulse duration is
-managed by the framegrabber.
+solely managed by the framegrabber.
 
 
-#### 0x0d Celaeno Humidity Production Set Point
+#### 0x31 Celaeno Humidity Production Set Point
 
 * Access :  Read/Write
 * Periodically emitted by node : never
@@ -164,19 +163,24 @@ managed by the framegrabber.
 	* Byte 0: Amount of humidity currently produced.
 
 
-#### 0x0e Celaeno Water Level
+#### 0x30 Celaeno Status
 
 * Access :  Read
 * Periodically emitted by node : yes on exceptional situation
   (warning / critical level reached).
 * Write: n.a.
 * Read :
-  * Data Length: 2
+  * Data Length: 3
   * Data fields:
-	* Byte 0:
-	  * 0xff-0x02: Functionning Normally
+	* Byte 0: Water Level Status
+	  * 0x00: Functionning Normally
 	  * 0x01: Warning Level Reached
-	  * 0x00: Critical Level Reached, Humidity Production Disabled.
+	  * 0x02: Critical Level Reached, Humidity Production Disabled.
+	  * 0x04: Incoherent sensor readout.
+  * Byte 1-2: Fan Status
+      * B0 - B13 : Fan Current RPM
+	  * B14 : If set, specifies a fan aging alert
+	  * B15 : If set, specifies a fan stall alert (Fan should spin but is not)
 
 
 ## FORT Network Control Command Specification

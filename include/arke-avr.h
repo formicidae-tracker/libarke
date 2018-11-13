@@ -7,9 +7,11 @@
 
 #include "inttypes.h"
 
-void InitArke();
+void InitArke(uint8_t * rxBuffer, uint8_t length);
 
-void ArkeProcess();
+#define ARKE_NO_MESSAGE 0
+
+yaacl_idt_t ArkeProcess(uint8_t * length);
 
 void ArkeSoftwareReset();
 
@@ -28,7 +30,9 @@ void ArkeSoftwareReset();
 
 
 #define ARKE_DECLARE_SENDER_FUNCTION(name) \
-	yaacl_error_e ArkeSend ## name(yaacl_txn_t * txn,bool rtr, bool emergency, uint8_t subID,const Arke ## name * data)
+	yaacl_error_e ArkeSend ## name(yaacl_txn_t * txn, bool emergency,const Arke ## name * data)
+
+
 
 ARKE_DECLARE_SENDER_FUNCTION(ZeusSetPoint);
 ARKE_DECLARE_SENDER_FUNCTION(ZeusReport);
