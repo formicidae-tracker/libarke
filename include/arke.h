@@ -38,7 +38,8 @@ typedef enum ArkeMessageClass_e {
 	ARKE_ZEUS_REPORT = 0x39,
 	ARKE_HELIOS_SET_POINT = 0x34,
 	ARKE_CELAENO_SET_POINT = 0x30,
-	ARKE_CELAENO_STATUS = 0x31
+	ARKE_CELAENO_STATUS = 0x31,
+	ARKE_CELAENO_CONFIG = 0x32
 } ArkeMessageClass;
 
 
@@ -82,13 +83,23 @@ typedef enum ArkeCelaenoWaterLevel_e {
 	ARKE_CELAENO_RO_ERROR = (1 << 2)
 } ArkeCelaenoWaterLevel;
 
-#define ARKE_CELAENO_FAN_AGING_ALERT (1 << 14)
-#define ARKE_CELAENO_FAN_STALL_ALERT (1 << 15)
+#define ARKE_CELAENO_FAN_AGING_ALERT (0x4000)
+#define ARKE_CELAENO_FAN_STALL_ALERT (0x8000)
 #define ARKE_CELAENO_FAN_RPM_MASK (0x1fff)
 
 #define ArkeCelaenoFanAging(status) (((status).fanStatus & ARKE_CELAENO_FAN_AGING_ALERT) != 0x0000)
 #define ArkeCelaenoFanStall(status) (((status).fanStatus & ARKE_CELAENO_FAN_STALL_ALERT) != 0x0000)
 #define ArkeCelaenoFanRPM(status) ( (status).fanStatus & ARKE_CELAENO_FAN_RPM_MASK )
+
+struct ArkeCelaenoConfig_t {
+	uint16_t RampUpTimeMS;
+	uint16_t RampDownTimeMS;
+	uint16_t MinOnTimeMS;
+	uint16_t DebounceTimeMS;
+} __attribute__((packed));
+
+typedef struct ArkeCelaenoConfig_t ArkeCelaenoConfig;
+
 
 
 #ifdef __cplusplus

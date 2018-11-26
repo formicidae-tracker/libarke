@@ -39,10 +39,12 @@ ARKE_DECLARE_SENDER_FUNCTION(ZeusReport);
 ARKE_DECLARE_SENDER_FUNCTION(HeliosSetPoint);
 ARKE_DECLARE_SENDER_FUNCTION(CelaenoSetPoint);
 ARKE_DECLARE_SENDER_FUNCTION(CelaenoStatus);
+ARKE_DECLARE_SENDER_FUNCTION(CelaenoConfig);
 
 #define ArkeZeusSetPointClassValue ARKE_ZEUS_SET_POINT
 #define ArkeZeusReportClassValue ARKE_ZEUS_REPORT
 #define ArkeHeliosSetPointClassValue ARKE_HELIOS_SET_POINT
 #define ArkeCelaenoSetPointClassValue ARKE_CELAENO_SET_POINT
 #define ArkeCelaenoStatusClassValue   ARKE_CELAENO_STATUS
+#define ArkeCelaenoConfigClassValue   ARKE_CELAENO_CONFIG
 #define ARKE_MESSAGE_STRUCT_TO_CLASS(name) ( name ## ClassValue)
