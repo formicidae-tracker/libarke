@@ -36,6 +36,8 @@ typedef enum ArkeNetworkCommand_e {
 typedef enum ArkeMessageClass_e {
 	ARKE_ZEUS_SET_POINT = 0x38,
 	ARKE_ZEUS_REPORT = 0x39,
+	ARKE_ZEUS_VIBRATION_REPORT = 0x40,
+	ARKE_ZEUS_CONFIG = 0x41,
 	ARKE_HELIOS_SET_POINT = 0x34,
 	ARKE_CELAENO_SET_POINT = 0x30,
 	ARKE_CELAENO_STATUS = 0x31,
@@ -49,6 +51,9 @@ struct ArkeZeusSetPoint_t {
 } __attribute__((packed));
 typedef struct ArkeZeusSetPoint_t ArkeZeusSetPoint;
 
+void ArkeZeusSetTargetHumidity(ArkeZeusSetPoint * sp);
+void ArkeZeusSetTargetTemperature(ArkeZeusSetPoint * sp);
+
 struct ArkeZeusReport_t {
 	uint16_t Humidity:14;
 	uint16_t Temperature1:14;
@@ -57,6 +62,31 @@ struct ArkeZeusReport_t {
 	uint16_t Temperature4:12;
 } __attribute__((packed));
 typedef struct ArkeZeusReport_t ArkeZeusReport;
+
+float ArkeZeusGetHumidity(const ArkeZeusReport * r);
+float ArkeZeusGetTemperature1(const ArkeZeusReport * r);
+float ArkeZeusGetTemperature2(const ArkeZeusReport * r);
+float ArkeZeusGetTemperature3(const ArkeZeusReport * r);
+float ArkeZeusGetTemperature4(const ArkeZeusReport * r);
+
+struct ArkePDConfig_t {
+	uint8_t DeadRegion;
+	uint8_t ProportionalMult;
+	uint8_t DerivativeMult;
+	uint8_t ProportionalDivPower2:4;
+	uint8_t DerivativeDivPower2:4;
+} __attribute__((packed));
+
+typedef struct ArkePDConfig_t ArkePDConfig;
+
+struct ArkeZeusConfig_t {
+	ArkePDConfig Humidity;
+	ArkePDConfig Temperature;
+} __attribute__((packed));
+
+typedef struct ArkeZeusConfig_t ArkeZeusConfig;
+
+
 
 struct ArkeHeliosSetPoint_t {
 	uint8_t Visible;
