@@ -48,6 +48,7 @@ typedef enum ArkeMessageClass_e {
 struct ArkeZeusSetPoint_t {
 	uint16_t Humidity;
 	uint16_t Temperature;
+	uint8_t  Wind;
 } __attribute__((packed));
 typedef struct ArkeZeusSetPoint_t ArkeZeusSetPoint;
 
