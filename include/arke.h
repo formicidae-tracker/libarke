@@ -64,6 +64,7 @@ struct ArkeZeusReport_t {
 } __attribute__((packed));
 typedef struct ArkeZeusReport_t ArkeZeusReport;
 
+
 float ArkeZeusGetHumidity(const ArkeZeusReport * r);
 float ArkeZeusGetTemperature1(const ArkeZeusReport * r);
 float ArkeZeusGetTemperature2(const ArkeZeusReport * r);
@@ -87,6 +88,22 @@ struct ArkeZeusConfig_t {
 
 typedef struct ArkeZeusConfig_t ArkeZeusConfig;
 
+#define ARKE_FAN_AGING_ALERT (0x4000)
+#define ARKE_FAN_STALL_ALERT (0x8000)
+#define ARKE_FAN_RPM_MASK (0x1fff)
+
+#define ArkeFanAging(status) (((status).fanStatus & ARKE_FAN_AGING_ALERT) != 0x0000)
+#define ArkeFanStall(status) (((status).fanStatus & ARKE_FAN_STALL_ALERT) != 0x0000)
+#define ArkeFanRPM(status) ( (status).fanStatus & ARKE_FAN_RPM_MASK )
+
+typedef uint16_t ArkeFanStatus;
+
+struct ArkeZeusStatus_t {
+	uint8_t       Status;
+	ArkeFanStatus Fan[2];
+} __attribute__((packed));
+
+typedef struct ArkeZeusStatus_t ArkeZeusStatus;
 
 
 struct ArkeHeliosSetPoint_t {
@@ -102,7 +119,7 @@ typedef struct ArkeCelaenoSetPoint_t  ArkeCelaenoSetPoint;
 
 struct ArkeCelaenoStatus_t {
 	uint8_t  waterLevel;
-	uint16_t fanStatus;
+	ArkeFanStatus fanStatus;
 } __attribute__((packed));
 typedef struct ArkeCelaenoStatus_t  ArkeCelaenoStatus;
 
@@ -114,13 +131,6 @@ typedef enum ArkeCelaenoWaterLevel_e {
 	ARKE_CELAENO_RO_ERROR = (1 << 2)
 } ArkeCelaenoWaterLevel;
 
-#define ARKE_CELAENO_FAN_AGING_ALERT (0x4000)
-#define ARKE_CELAENO_FAN_STALL_ALERT (0x8000)
-#define ARKE_CELAENO_FAN_RPM_MASK (0x1fff)
-
-#define ArkeCelaenoFanAging(status) (((status).fanStatus & ARKE_CELAENO_FAN_AGING_ALERT) != 0x0000)
-#define ArkeCelaenoFanStall(status) (((status).fanStatus & ARKE_CELAENO_FAN_STALL_ALERT) != 0x0000)
-#define ArkeCelaenoFanRPM(status) ( (status).fanStatus & ARKE_CELAENO_FAN_RPM_MASK )
 
 struct ArkeCelaenoConfig_t {
 	uint16_t RampUpTimeMS;
