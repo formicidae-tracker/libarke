@@ -54,10 +54,6 @@ struct ArkeZeusSetPoint_t {
 } __attribute__((packed));
 typedef struct ArkeZeusSetPoint_t ArkeZeusSetPoint;
 
-void ArkeZeusSetTargetHumidity(ArkeZeusSetPoint * sp,float);
-void ArkeZeusSetTargetTemperature(ArkeZeusSetPoint * sp,float);
-void ArkeZeusSetTargetWind(ArkeZeusSetPoint * sp,uint8_t power);
-
 
 struct ArkeZeusReport_t {
 	uint16_t Humidity:14;
@@ -68,12 +64,6 @@ struct ArkeZeusReport_t {
 } __attribute__((packed));
 typedef struct ArkeZeusReport_t ArkeZeusReport;
 
-
-float ArkeZeusGetHumidity(const ArkeZeusReport * r);
-float ArkeZeusGetTemperature1(const ArkeZeusReport * r);
-float ArkeZeusGetTemperature2(const ArkeZeusReport * r);
-float ArkeZeusGetTemperature3(const ArkeZeusReport * r);
-float ArkeZeusGetTemperature4(const ArkeZeusReport * r);
 
 struct ArkePDConfig_t {
 	uint8_t DeadRegion;
@@ -144,6 +134,11 @@ typedef enum ArkeCelaenoWaterLevel_e {
 	ARKE_CELAENO_CRITICAL = (1 << 1),
 	ARKE_CELAENO_RO_ERROR = (1 << 2)
 } ArkeCelaenoWaterLevel;
+
+#define ArkeCelaenoWaterNominal(status) ( (status).waterLevel == 0 )
+#define ArkeCelaenoWaterWarning(status) ( (status).waterLevel == ARKE_CELAENO_WARNING )
+#define ArkeCelaenoWaterCritical(status) ( ((status).waterLevel & ~(ARKE_CELAENO_CRITICAL | ARKE_CELAENO_RO_ERROR) ) == ARKE_CELAENO_WARNING )
+#define ArkeCelaenoWaterHasRoError(status) (((status).waterLevel & ARKE_CELAENO_RO_ERROR) != 0x00)
 
 
 struct ArkeCelaenoConfig_t {
