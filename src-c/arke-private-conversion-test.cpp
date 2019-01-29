@@ -115,7 +115,6 @@ TEST(Conversion,HIHTemperatureToFloat) {
 
 	EXPECT_TRUE(std::isnan(hih6030_temperature_to_float(16383)));
 	EXPECT_TRUE(std::isnan(hih6030_temperature_to_float(16384)));
-
 	std::vector<TestData> testData = {
 		{125.00,16382},
 		{0.0,3971},
