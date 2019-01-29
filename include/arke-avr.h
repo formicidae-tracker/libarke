@@ -36,6 +36,8 @@ void ArkeSoftwareReset();
 
 ARKE_DECLARE_SENDER_FUNCTION(ZeusSetPoint);
 ARKE_DECLARE_SENDER_FUNCTION(ZeusReport);
+ARKE_DECLARE_SENDER_FUNCTION(ZeusConfig);
+ARKE_DECLARE_SENDER_FUNCTION(ZeusStatus);
 ARKE_DECLARE_SENDER_FUNCTION(HeliosSetPoint);
 ARKE_DECLARE_SENDER_FUNCTION(CelaenoSetPoint);
 ARKE_DECLARE_SENDER_FUNCTION(CelaenoStatus);
@@ -43,6 +45,8 @@ ARKE_DECLARE_SENDER_FUNCTION(CelaenoConfig);
 
 #define ArkeZeusSetPointClassValue ARKE_ZEUS_SET_POINT
 #define ArkeZeusReportClassValue ARKE_ZEUS_REPORT
+#define ArkeZeusStatusClassValue ARKE_ZEUS_STATUS
+#define ArkeZeusConfigClassValue ARKE_ZEUS_CONFIG
 #define ArkeHeliosSetPointClassValue ARKE_HELIOS_SET_POINT
 #define ArkeCelaenoSetPointClassValue ARKE_CELAENO_SET_POINT
 #define ArkeCelaenoStatusClassValue   ARKE_CELAENO_STATUS

@@ -225,6 +225,8 @@ yaacl_idt_t ArkeProcess(uint8_t * length) {
 
 implement_sender_function(ZeusSetPoint)
 implement_sender_function(ZeusReport)
+implement_sender_function(ZeusStatus)
+implement_sender_function(ZeusConfig)
 implement_sender_function(HeliosSetPoint)
 implement_sender_function(CelaenoSetPoint)
 implement_sender_function(CelaenoStatus)
