@@ -9,7 +9,7 @@ extern "C" {
 
 	void ArkeZeusSetTargetHumidity(ArkeZeusSetPoint * sp,float humidity);
 	void ArkeZeusSetTargetTemperature(ArkeZeusSetPoint * sp,float humidity);
-	void ArkeZeusSetTargetWind(const ArkeZeusSetPoint * sp,uint8_t power);
+	void ArkeZeusSetTargetWind(ArkeZeusSetPoint * sp,uint8_t power);
 
 	float ArkeZeusGetTargetHumidity(const ArkeZeusSetPoint * sp);
 	float ArkeZeusGetTargetTemperature(const ArkeZeusSetPoint * sp);

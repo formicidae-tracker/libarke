@@ -14,7 +14,7 @@ void ArkeZeusSetTargetTemperature(ArkeZeusSetPoint * sp,float value) {
 }
 
 void ArkeZeusSetTargetWind(ArkeZeusSetPoint * sp,uint8_t power) {
-	sp->Power = power;
+	sp->Wind = power;
 }
 
 
@@ -40,13 +40,13 @@ float ArkeZeusGetTemperature1(const ArkeZeusReport * r) {
 }
 
 float ArkeZeusGetTemperature2(const ArkeZeusReport * r) {
-
+	return tmp1075_to_float(r->Temperature2);
 }
 
 float ArkeZeusGetTemperature3(const ArkeZeusReport * r) {
-
+	return tmp1075_to_float(r->Temperature3);
 }
 
 float ArkeZeusGetTemperature4(const ArkeZeusReport * r) {
-
+	return tmp1075_to_float(r->Temperature4);
 }

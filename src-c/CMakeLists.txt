@@ -1,4 +1,4 @@
-add_library(arke arke-src-all.c)
+add_library(arke STATIC arke-src-all.c)
 
 
 set(TEST_SRC_FILES main-check.cpp arke-private-conversion-test.cpp)
