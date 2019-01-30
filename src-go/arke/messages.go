@@ -34,7 +34,7 @@ const (
 )
 
 type Marshaller interface {
-	Marshall([]byte) uint8
+	Marshall([]byte) (int, error)
 }
 
 type Unmarshaller interface {

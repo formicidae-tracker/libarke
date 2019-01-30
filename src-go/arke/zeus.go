@@ -10,25 +10,38 @@ import (
 import "C"
 
 type ZeusSetPoint struct {
-	Humidity   float32
-	Temprature float32
-	Wind       uint8
+	Humidity    float32
+	Temperature float32
+	Wind        uint8
 }
 
-func (m ZeusSetPoint) Marshall(buf []byte) uint8 {
+func checkSize(buf []byte, expected int) error {
+	if len(buf) < expected {
+		return fmt.Errorf("Invalid buffer size %d, required %d", len(buf), expected)
+	}
+	return nil
+}
+
+func (m ZeusSetPoint) Marshall(buf []byte) (int, error) {
+	if err := checkSize(buf, 5); err != nil {
+		return 0, err
+	}
 	binary.LittleEndian.PutUint16(buf[0:], humidityFloatToBinary(m.Humidity))
-	binary.LittleEndian.PutUint16(buf[2:], hih6030TemperatureFloatToBinary(m.Temprature))
+	binary.LittleEndian.PutUint16(buf[2:], hih6030TemperatureFloatToBinary(m.Temperature))
 	buf[4] = m.Wind
-	return 5
+	return 5, nil
 }
 
-func (m ZeusSetPoint) Unmarshall(buf []byte) error {
+func (m *ZeusSetPoint) Unmarshall(buf []byte) error {
+	if err := checkSize(buf, 5); err != nil {
+		return err
+	}
 	m.Humidity = humidityBinaryToFloat(binary.LittleEndian.Uint16(buf[0:]))
 	if math.IsNaN(float64(m.Humidity)) == true {
 		return fmt.Errorf("Invalid humidity value")
 	}
-	m.Temprature = hih6030TemperatureBinaryToFloat(binary.LittleEndian.Uint16(buf[2:]))
-	if math.IsNaN(float64(m.Temprature)) == true {
+	m.Temperature = hih6030TemperatureBinaryToFloat(binary.LittleEndian.Uint16(buf[2:]))
+	if math.IsNaN(float64(m.Temperature)) == true {
 		return fmt.Errorf("Invalid temperature value")
 	}
 	m.Wind = buf[4]
@@ -40,25 +53,28 @@ type ZeusReport struct {
 	Temperature [4]float32
 }
 
-func (m ZeusReport) Unmarshall(buf []byte) error {
+func (m *ZeusReport) Unmarshall(buf []byte) error {
+	if err := checkSize(buf, 8); err != nil {
+		return err
+	}
 	packed := []uint16{
 		binary.LittleEndian.Uint16(buf[0:]),
 		binary.LittleEndian.Uint16(buf[2:]),
 		binary.LittleEndian.Uint16(buf[4:]),
 		binary.LittleEndian.Uint16(buf[6:]),
 	}
-	m.Humidity = humidityBinaryToFloat(packed[0] >> 2)
+	m.Humidity = humidityBinaryToFloat(packed[0] & 0x3fff)
 	if math.IsNaN(float64(m.Humidity)) == true {
 		return fmt.Errorf("Invalid humidity value")
 	}
 
-	m.Temperature[0] = hih6030TemperatureBinaryToFloat(((packed[0] & 0x03) << 12) | packed[1]>>4)
+	m.Temperature[0] = hih6030TemperatureBinaryToFloat((packed[0] >> 14) | (packed[1]&0x0fff)<<2)
 	if math.IsNaN(float64(m.Temperature[0])) == true {
 		return fmt.Errorf("Invalid Temperature[0] value")
 	}
-	m.Temperature[1] = tmp1075BinaryToFloat(((packed[1] & 0x0f) << 8) | packed[2]>>8)
-	m.Temperature[2] = tmp1075BinaryToFloat(((packed[2] & 0xff) << 4) | packed[3]>>12)
-	m.Temperature[3] = tmp1075BinaryToFloat(packed[3] & 0x0fff)
+	m.Temperature[1] = tmp1075BinaryToFloat((packed[1] >> 12) | (packed[2]&0x00ff)<<4)
+	m.Temperature[2] = tmp1075BinaryToFloat((packed[2] >> 8) | (packed[3]&0x000f)<<8)
+	m.Temperature[3] = tmp1075BinaryToFloat((packed[3] & 0xfff0) >> 4)
 	return nil
 }
 
@@ -67,23 +83,26 @@ type ZeusConfig struct {
 	Temperature PDConfig
 }
 
+func (m ZeusConfig) Marshall(buf []byte) (int, error) {
+	if len(buf) < 8 {
+		return 0, fmt.Errorf("Invalid buffer size %d, required 8", len(buf))
+	}
+	m.Humidity.marshall(buf[0:])
+	m.Temperature.marshall(buf[4:])
+	return 8, nil
+}
+
+func (m *ZeusConfig) Unmarshall(buf []byte) error {
+	m.Humidity.unmarshall(buf[0:])
+	m.Temperature.unmarshall(buf[4:])
+	return nil
+}
+
 type ZeusStatus struct {
 	status      uint8
 	fans        [2]FanStatus
 	humidity    int16
 	temperature int16
-}
-
-func (m ZeusConfig) Marshall(buf []byte) uint8 {
-	m.Humidity.marshall(buf[0:])
-	m.Temperature.marshall(buf[4:])
-	return 8
-}
-
-func (m ZeusConfig) Unmarshall(buf []byte) error {
-	m.Humidity.unmarshall(buf[0:])
-	m.Temperature.unmarshall(buf[4:])
-	return nil
 }
 
 type ZeusControlStatus uint8
@@ -125,4 +144,16 @@ func (s ZeusStatus) TemperatureCommand() (int16, error) {
 		return 0, fmt.Errorf("Packet contains fan status")
 	}
 	return s.temperature, nil
+}
+
+func (m ZeusStatus) Unmarshall(buf []byte) error {
+	m.status = buf[0]
+	if m.IsFanStatus() {
+		m.fans[0] = FanStatus(binary.LittleEndian.Uint16(buf[1:]))
+		m.fans[1] = FanStatus(binary.LittleEndian.Uint16(buf[3:]))
+	} else {
+		m.humidity = int16(binary.LittleEndian.Uint16(buf[1:]))
+		m.temperature = int16(binary.LittleEndian.Uint16(buf[3:]))
+	}
+	return nil
 }
