@@ -132,4 +132,6 @@ func (s *ZeusSuite) TestReportIO(c *C) {
 		}
 
 	}
+	m := ZeusReport{}
+	c.Check(m.Unmarshall([]byte{}), ErrorMatches, "Invalid buffer size .*")
 }

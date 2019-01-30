@@ -87,8 +87,12 @@ func (m ZeusConfig) Marshall(buf []byte) (int, error) {
 	if len(buf) < 8 {
 		return 0, fmt.Errorf("Invalid buffer size %d, required 8", len(buf))
 	}
-	m.Humidity.marshall(buf[0:])
-	m.Temperature.marshall(buf[4:])
+	if err := m.Humidity.marshall(buf[0:]); err != nil {
+		return 0, err
+	}
+	if err := m.Temperature.marshall(buf[4:]); err != nil {
+		return 4, err
+	}
 	return 8, nil
 }
 
