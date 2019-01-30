@@ -15,6 +15,10 @@ type ZeusSetPoint struct {
 	Wind        uint8
 }
 
+func (m *ZeusSetPoint) MessageClassID() uint16 {
+	return ZeusSetPointMessage
+}
+
 func checkSize(buf []byte, expected int) error {
 	if len(buf) < expected {
 		return fmt.Errorf("Invalid buffer size %d, required %d", len(buf), expected)
@@ -53,6 +57,10 @@ type ZeusReport struct {
 	Temperature [4]float32
 }
 
+func (m *ZeusReport) MessageClassID() uint16 {
+	return ZeusReportMessage
+}
+
 func (m *ZeusReport) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
@@ -83,6 +91,10 @@ type ZeusConfig struct {
 	Temperature PDConfig
 }
 
+func (m *ZeusConfig) MessageClassID() uint16 {
+	return ZeusConfigMessage
+}
+
 func (m ZeusConfig) Marshall(buf []byte) (int, error) {
 	if err := checkSize(buf, 8); err != nil {
 		return 0, err
@@ -105,16 +117,20 @@ func (m *ZeusConfig) Unmarshall(buf []byte) error {
 	return nil
 }
 
-type ZeusStatus struct {
-	Status uint8
-	Fans   [2]FanStatusAndRPM
-}
-
 const (
 	ZeusIdle                         uint8 = C.ARKE_ZEUS_IDLE
 	ZeusActive                       uint8 = C.ARKE_ZEUS_ACTIVE
 	ZeusClimateNotControlledWatchDog uint8 = C.ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD
 )
+
+type ZeusStatus struct {
+	Status uint8
+	Fans   [2]FanStatusAndRPM
+}
+
+func (m *ZeusStatus) MessageClassID() uint16 {
+	return ZeusStatusMessage
+}
 
 func (m *ZeusStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 5); err != nil {
@@ -131,6 +147,10 @@ type ZeusControlPoint struct {
 	Temperature int16
 }
 
+func (m *ZeusControlPoint) MessageClassID() uint16 {
+	return ZeusControlPointMessage
+}
+
 func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 4); err != nil {
 		return err
@@ -138,4 +158,12 @@ func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
 	m.Humidity = int16(binary.LittleEndian.Uint16(buf[0:]))
 	m.Temperature = int16(binary.LittleEndian.Uint16(buf[2:]))
 	return nil
+}
+
+func init() {
+	messageFactory[ZeusSetPointMessage] = func() ReceivableMessage { return &ZeusSetPoint{} }
+	messageFactory[ZeusReportMessage] = func() ReceivableMessage { return &ZeusReport{} }
+	messageFactory[ZeusConfigMessage] = func() ReceivableMessage { return &ZeusConfig{} }
+	messageFactory[ZeusStatusMessage] = func() ReceivableMessage { return &ZeusStatus{} }
+	messageFactory[ZeusControlPointMessage] = func() ReceivableMessage { return &ZeusControlPoint{} }
 }

@@ -22,3 +22,11 @@ func (c *HeliosSetPoint) Unmarshall(buf []byte) error {
 	c.UV = buf[1]
 	return nil
 }
+
+func (m *HeliosSetPoint) MessageClassID() uint16 {
+	return HeliosSetPointMessage
+}
+
+func init() {
+	messageFactory[HeliosSetPointMessage] = func() ReceivableMessage { return &HeliosSetPoint{} }
+}

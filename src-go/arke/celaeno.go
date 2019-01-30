@@ -10,6 +10,10 @@ type CelaenoSetPoint struct {
 	Power uint8
 }
 
+func (m *CelaenoSetPoint) MessageClassID() uint16 {
+	return CelaenoSetPointMessage
+}
+
 func (c CelaenoSetPoint) Marshall(buf []byte) (int, error) {
 	if err := checkSize(buf, 1); err != nil {
 		return 0, err
@@ -31,6 +35,10 @@ type CelaenoStatus struct {
 	Fan        FanStatusAndRPM
 }
 
+func (m *CelaenoStatus) MessageClassID() uint16 {
+	return CelaenoStatusMessage
+}
+
 func (c *CelaenoStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 3); err != nil {
 		return err
@@ -45,6 +53,10 @@ type CelaenoConfig struct {
 	RampDownTime  time.Duration
 	MinimumOnTime time.Duration
 	DebounceTime  time.Duration
+}
+
+func (m *CelaenoConfig) MessageClassID() uint16 {
+	return CelaenoConfigNessage
 }
 
 const MaxUint16 = ^uint16(0)
@@ -80,4 +92,10 @@ func (c *CelaenoConfig) Unmarshall(buf []byte) error {
 	c.MinimumOnTime = time.Duration(binary.LittleEndian.Uint16(buf[4:])) * time.Millisecond
 	c.DebounceTime = time.Duration(binary.LittleEndian.Uint16(buf[6:])) * time.Millisecond
 	return nil
+}
+
+func init() {
+	messageFactory[CelaenoSetPointMessage] = func() ReceivableMessage { return &CelaenoSetPoint{} }
+	messageFactory[CelaenoStatusMessage] = func() ReceivableMessage { return &CelaenoStatus{} }
+	messageFactory[CelaenoConfigNessage] = func() ReceivableMessage { return &CelaenoConfig{} }
 }
