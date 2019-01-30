@@ -74,6 +74,18 @@ type ZeusStatus struct {
 	temperature int16
 }
 
+func (m ZeusConfig) Marshall(buf []byte) uint8 {
+	m.Humidity.marshall(buf[0:])
+	m.Temperature.marshall(buf[4:])
+	return 8
+}
+
+func (m ZeusConfig) Unmarshall(buf []byte) error {
+	m.Humidity.unmarshall(buf[0:])
+	m.Temperature.unmarshall(buf[4:])
+	return nil
+}
+
 type ZeusControlStatus uint8
 
 const (
