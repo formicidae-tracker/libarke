@@ -70,7 +70,7 @@ func (m *ZeusReport) Unmarshall(buf []byte) error {
 
 	m.Temperature[0] = hih6030TemperatureBinaryToFloat((packed[0] >> 14) | (packed[1]&0x0fff)<<2)
 	if math.IsNaN(float64(m.Temperature[0])) == true {
-		return fmt.Errorf("Invalid Temperature[0] value")
+		return fmt.Errorf("Invalid temperature value")
 	}
 	m.Temperature[1] = tmp1075BinaryToFloat((packed[1] >> 12) | (packed[2]&0x00ff)<<4)
 	m.Temperature[2] = tmp1075BinaryToFloat((packed[2] >> 8) | (packed[3]&0x000f)<<8)
@@ -84,8 +84,8 @@ type ZeusConfig struct {
 }
 
 func (m ZeusConfig) Marshall(buf []byte) (int, error) {
-	if len(buf) < 8 {
-		return 0, fmt.Errorf("Invalid buffer size %d, required 8", len(buf))
+	if err := checkSize(buf, 8); err != nil {
+		return 0, err
 	}
 	if err := m.Humidity.marshall(buf[0:]); err != nil {
 		return 0, err
@@ -97,67 +97,45 @@ func (m ZeusConfig) Marshall(buf []byte) (int, error) {
 }
 
 func (m *ZeusConfig) Unmarshall(buf []byte) error {
+	if err := checkSize(buf, 8); err != nil {
+		return err
+	}
 	m.Humidity.unmarshall(buf[0:])
 	m.Temperature.unmarshall(buf[4:])
 	return nil
 }
 
 type ZeusStatus struct {
-	status      uint8
-	fans        [2]FanStatus
-	humidity    int16
-	temperature int16
+	Status uint8
+	Fans   [2]FanStatusAndRPM
 }
-
-type ZeusControlStatus uint8
 
 const (
-	ZeusIdle                         ZeusControlStatus = C.ARKE_ZEUS_IDLE
-	ZeusActive                       ZeusControlStatus = C.ARKE_ZEUS_ACTIVE
-	ZeusClimateNotControlledWatchDog ZeusControlStatus = C.ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD
+	ZeusIdle                         uint8 = C.ARKE_ZEUS_IDLE
+	ZeusActive                       uint8 = C.ARKE_ZEUS_ACTIVE
+	ZeusClimateNotControlledWatchDog uint8 = C.ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD
 )
 
-func (s ZeusStatus) ControlStatus() ZeusControlStatus {
-	return ZeusControlStatus(s.status & 0x03)
-}
-
-func (s ZeusStatus) IsFanStatus() bool {
-	return (s.status)&C.ARKE_ZEUS_STATUS_IS_COMMAND_DATA == 0
-}
-
-func (s ZeusStatus) IsCommandData() bool {
-	return (s.status)&C.ARKE_ZEUS_STATUS_IS_COMMAND_DATA == 0
-}
-
-func (s ZeusStatus) FanStatus() ([2]FanStatus, error) {
-	if s.IsCommandData() {
-		return [2]FanStatus{}, fmt.Errorf("Packet contains command data")
+func (m *ZeusStatus) Unmarshall(buf []byte) error {
+	if err := checkSize(buf, 5); err != nil {
+		return err
 	}
-	return s.fans, nil
+	m.Status = buf[0]
+	m.Fans[0] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
+	m.Fans[1] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[3:]))
+	return nil
 }
 
-func (s ZeusStatus) HumidityCommand() (int16, error) {
-	if s.IsFanStatus() {
-		return 0, fmt.Errorf("Packet contains fan status")
-	}
-	return s.humidity, nil
+type ZeusControlPoint struct {
+	Humidity    int16
+	Temperature int16
 }
 
-func (s ZeusStatus) TemperatureCommand() (int16, error) {
-	if s.IsFanStatus() {
-		return 0, fmt.Errorf("Packet contains fan status")
+func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
+	if err := checkSize(buf, 4); err != nil {
+		return err
 	}
-	return s.temperature, nil
-}
-
-func (m ZeusStatus) Unmarshall(buf []byte) error {
-	m.status = buf[0]
-	if m.IsFanStatus() {
-		m.fans[0] = FanStatus(binary.LittleEndian.Uint16(buf[1:]))
-		m.fans[1] = FanStatus(binary.LittleEndian.Uint16(buf[3:]))
-	} else {
-		m.humidity = int16(binary.LittleEndian.Uint16(buf[1:]))
-		m.temperature = int16(binary.LittleEndian.Uint16(buf[3:]))
-	}
+	m.Humidity = int16(binary.LittleEndian.Uint16(buf[0:]))
+	m.Temperature = int16(binary.LittleEndian.Uint16(buf[2:]))
 	return nil
 }

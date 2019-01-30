@@ -26,6 +26,7 @@ const (
 	ZeusVibrationReportMessage uint16 = C.ARKE_ZEUS_VIBRATION_REPORT
 	ZeusConfigMessage          uint16 = C.ARKE_ZEUS_CONFIG
 	ZeusStatusMessage          uint16 = C.ARKE_ZEUS_STATUS
+	ZeusControlPointMessage    uint16 = C.ARKE_ZEUS_CONTROL_POINT
 	HeliosSetPointMessage      uint16 = C.ARKE_HELIOS_SET_POINT
 	HeliosPulseModeMessage     uint16 = C.ARKE_HELIOS_PULSE_MODE
 	CelaenoSetPointMessage     uint16 = C.ARKE_CELAENO_SET_POINT

@@ -132,6 +132,199 @@ func (s *ZeusSuite) TestReportIO(c *C) {
 		}
 
 	}
-	m := ZeusReport{}
+
+	errorData := []struct {
+		Buffer []byte
+		Ematch string
+	}{
+		{
+			[]byte{},
+			"Invalid buffer size .*",
+		},
+		{
+			[]byte{0xff, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			"Invalid humidity value",
+		},
+		{
+			[]byte{0x00, 0xc0, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00},
+			"Invalid temperature value",
+		},
+	}
+
+	for _, d := range errorData {
+		m := ZeusReport{}
+		c.Check(m.Unmarshall(d.Buffer), ErrorMatches, d.Ematch)
+	}
+}
+
+func (s *ZeusSuite) TestConfigIO(c *C) {
+	testData := []struct {
+		Message ZeusConfig
+		Buffer  []byte
+	}{
+		{
+			Message: ZeusConfig{
+				Humidity: PDConfig{
+					DeadRegion:              127,
+					ProportionnalMultiplier: 100,
+					DerivativeMultiplier:    50,
+					ProportionalDivider:     1,
+					DerivativeDivider:       2,
+				},
+				Temperature: PDConfig{
+					DeadRegion:              60,
+					ProportionnalMultiplier: 103,
+					DerivativeMultiplier:    102,
+					ProportionalDivider:     4,
+					DerivativeDivider:       5,
+				},
+			},
+			Buffer: []byte{
+				127, 100, 50, (2 << 4) | 1, 60, 103, 102, (5 << 4) | 4,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		res := ZeusConfig{}
+		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
+			continue
+		}
+		c.Check(res, DeepEquals, d.Message)
+	}
+
+	for _, d := range testData {
+		res := make([]byte, 8)
+		n, err := d.Message.Marshall(res)
+		if c.Check(err, IsNil) == false {
+			continue
+		}
+		c.Check(n, Equals, 8)
+		c.Check(res, DeepEquals, d.Buffer)
+	}
+
+	errorData := []struct {
+		Message ZeusConfig
+		Buffer  []byte
+		Ematch  string
+	}{
+		{
+			ZeusConfig{},
+			make([]byte, 0),
+			"Invalid buffer size .*",
+		},
+		{
+			ZeusConfig{
+				Humidity: PDConfig{
+					DerivativeDivider: 16,
+				},
+			},
+			make([]byte, 8),
+			"Maximal Derivative Divider is 15",
+		},
+		{
+			ZeusConfig{
+				Temperature: PDConfig{
+					ProportionalDivider: 16,
+				},
+			},
+			make([]byte, 8),
+			"Maximal Proportional Divider is 15",
+		},
+	}
+
+	for _, d := range errorData {
+		_, err := d.Message.Marshall(d.Buffer)
+		c.Check(err, ErrorMatches, d.Ematch)
+	}
+
+	m := ZeusConfig{}
 	c.Check(m.Unmarshall([]byte{}), ErrorMatches, "Invalid buffer size .*")
+}
+
+func (s *ZeusSuite) TestStatusIO(c *C) {
+	testData := []struct {
+		Message ZeusStatus
+		Buffer  []byte
+	}{
+		{
+			Message: ZeusStatus{
+				Status: ZeusIdle,
+				Fans: [2]FanStatusAndRPM{
+					1200,
+					FanStatusAndRPM(0 | (uint16(FanStalled) << 14)),
+				},
+			},
+			Buffer: []byte{
+				0, 0xb0, 0x04, 0x00, 0x80,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		res := ZeusStatus{}
+		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
+			continue
+		}
+		c.Check(res, DeepEquals, d.Message)
+	}
+
+	errorData := []struct {
+		Buffer []byte
+		Ematch string
+	}{
+		{
+			make([]byte, 0),
+			"Invalid buffer size .*",
+		},
+	}
+
+	for _, d := range errorData {
+		m := ZeusStatus{}
+		err := m.Unmarshall(d.Buffer)
+		c.Check(err, ErrorMatches, d.Ematch)
+	}
+
+}
+
+func (s *ZeusSuite) TestControlPointIO(c *C) {
+	testData := []struct {
+		Message ZeusControlPoint
+		Buffer  []byte
+	}{
+		{
+			Message: ZeusControlPoint{
+				Humidity:    1234,
+				Temperature: -275,
+			},
+			Buffer: []byte{
+				0xd2, 0x04, 0xed, 0xfe,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		res := ZeusControlPoint{}
+		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
+			continue
+		}
+		c.Check(res, DeepEquals, d.Message)
+	}
+
+	errorData := []struct {
+		Buffer []byte
+		Ematch string
+	}{
+		{
+			make([]byte, 0),
+			"Invalid buffer size .*",
+		},
+	}
+
+	for _, d := range errorData {
+		m := ZeusControlPoint{}
+		err := m.Unmarshall(d.Buffer)
+		c.Check(err, ErrorMatches, d.Ematch)
+	}
+
 }

@@ -25,7 +25,7 @@ func (c PDConfig) marshall(buffer []byte) error {
 	return nil
 }
 
-func (c PDConfig) unmarshall(buffer []byte) {
+func (c *PDConfig) unmarshall(buffer []byte) {
 	c.DeadRegion = buffer[0]
 	c.ProportionnalMultiplier = buffer[1]
 	c.DerivativeMultiplier = buffer[2]
