@@ -35,10 +35,10 @@ typedef enum ArkeNetworkCommand_e {
 typedef enum ArkeMessageClass_e {
 	ARKE_ZEUS_SET_POINT = 0x38,
 	ARKE_ZEUS_REPORT = 0x39,
-	ARKE_ZEUS_VIBRATION_REPORT = 0x40,
-	ARKE_ZEUS_CONFIG = 0x41,
-	ARKE_ZEUS_STATUS = 0x42,
-	ARKE_ZEUS_CONTROL_POINT = 0x43,
+	ARKE_ZEUS_VIBRATION_REPORT = 0x3a,
+	ARKE_ZEUS_CONFIG = 0x3b,
+	ARKE_ZEUS_STATUS = 0x3c,
+	ARKE_ZEUS_CONTROL_POINT = 0x3d,
 	ARKE_HELIOS_SET_POINT = 0x34,
 	ARKE_HELIOS_PULSE_MODE = 0x35,
 	ARKE_CELAENO_SET_POINT = 0x30,
@@ -96,18 +96,16 @@ struct ArkeZeusStatus_t {
 	uint8_t       Status;
 	ArkeFanStatus Fan[2];
 } __attribute__((packed));
+typedef struct ArkeZeusStatus_t ArkeZeusStatus;
 
 #define ARKE_ZEUS_IDLE 0x00
 #define ARKE_ZEUS_ACTIVE 0x01
 #define ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD 0x02
 
-typedef struct ArkeZeusStatus_t ArkeZeusStatus;
-
 struct ArkeZeusControlPoint_t {
 	int16_t Humidity;
 	int16_t Temperature;
 } __attribute__((packed));
-
 typedef struct ArkeZeusControlPoint_t ArkeZeusControlPoint;
 
 struct ArkeHeliosSetPoint_t {
