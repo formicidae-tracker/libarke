@@ -23,7 +23,7 @@ func (c *HeliosSetPoint) Unmarshall(buf []byte) error {
 	return nil
 }
 
-func (m *HeliosSetPoint) MessageClassID() uint16 {
+func (m *HeliosSetPoint) MessageClassID() MessageClass {
 	return HeliosSetPointMessage
 }
 

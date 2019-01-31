@@ -15,7 +15,7 @@ type ZeusSetPoint struct {
 	Wind        uint8
 }
 
-func (m *ZeusSetPoint) MessageClassID() uint16 {
+func (m *ZeusSetPoint) MessageClassID() MessageClass {
 	return ZeusSetPointMessage
 }
 
@@ -57,7 +57,7 @@ type ZeusReport struct {
 	Temperature [4]float32
 }
 
-func (m *ZeusReport) MessageClassID() uint16 {
+func (m *ZeusReport) MessageClassID() MessageClass {
 	return ZeusReportMessage
 }
 
@@ -91,7 +91,7 @@ type ZeusConfig struct {
 	Temperature PDConfig
 }
 
-func (m *ZeusConfig) MessageClassID() uint16 {
+func (m *ZeusConfig) MessageClassID() MessageClass {
 	return ZeusConfigMessage
 }
 
@@ -128,7 +128,7 @@ type ZeusStatus struct {
 	Fans   [2]FanStatusAndRPM
 }
 
-func (m *ZeusStatus) MessageClassID() uint16 {
+func (m *ZeusStatus) MessageClassID() MessageClass {
 	return ZeusStatusMessage
 }
 
@@ -147,7 +147,7 @@ type ZeusControlPoint struct {
 	Temperature int16
 }
 
-func (m *ZeusControlPoint) MessageClassID() uint16 {
+func (m *ZeusControlPoint) MessageClassID() MessageClass {
 	return ZeusControlPointMessage
 }
 

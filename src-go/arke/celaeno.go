@@ -10,7 +10,7 @@ type CelaenoSetPoint struct {
 	Power uint8
 }
 
-func (m *CelaenoSetPoint) MessageClassID() uint16 {
+func (m *CelaenoSetPoint) MessageClassID() MessageClass {
 	return CelaenoSetPointMessage
 }
 
@@ -35,7 +35,7 @@ type CelaenoStatus struct {
 	Fan        FanStatusAndRPM
 }
 
-func (m *CelaenoStatus) MessageClassID() uint16 {
+func (m *CelaenoStatus) MessageClassID() MessageClass {
 	return CelaenoStatusMessage
 }
 
@@ -55,7 +55,7 @@ type CelaenoConfig struct {
 	DebounceTime  time.Duration
 }
 
-func (m *CelaenoConfig) MessageClassID() uint16 {
+func (m *CelaenoConfig) MessageClassID() MessageClass {
 	return CelaenoConfigNessage
 }
 
