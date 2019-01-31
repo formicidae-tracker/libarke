@@ -33,6 +33,7 @@ const (
 
 	BroadcastID NodeID = 0x00
 
+	HeartBeatMessage           MessageClass = MessageClass(HeartBeat << 9)
 	ZeusSetPointMessage        MessageClass = C.ARKE_ZEUS_SET_POINT
 	ZeusReportMessage          MessageClass = C.ARKE_ZEUS_REPORT
 	ZeusVibrationReportMessage MessageClass = C.ARKE_ZEUS_VIBRATION_REPORT
@@ -143,11 +144,17 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 
 	mType, mClass, mID := extractCANIDT(f.ID)
 	if mType == NetworkControlCommand {
-		return nil, 0, fmt.Errorf("Network Command")
+		return nil, 0, fmt.Errorf("Network Command Received")
 	}
 
 	if mType == HeartBeat {
-		return nil, 0, fmt.Errorf("Heartbeating not implemented yet")
+		res := &HeartBeatData{}
+		if err := res.Unmarshall(f.Data[0:f.Dlc]); err != nil {
+			return nil, mID, err
+		}
+		res.Class = NodeClass(mClass)
+		res.ID = mID
+		return res, mID, nil
 	}
 
 	creator, ok := messageFactory[mClass]
@@ -156,7 +163,7 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 	}
 
 	m := creator()
-	err := m.Unmarshall(f.Data)
+	err := m.Unmarshall(f.Data[0:f.Dlc])
 	if err != nil {
 		err = fmt.Errorf("Could not parse message data: %s", err)
 	}
