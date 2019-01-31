@@ -92,7 +92,7 @@ This table gives all message categories that could be found on the bus.
 
 | Message Category | Name                                          | Node         | Node Class ID (without subID) |
 |-----------------:|:----------------------------------------------|:-------------|:------------------------------|
-|        0x3a-0x3f | Reserved (Zeus)                               | Zeus         | 0x38                          |
+|        0x39-0x3f | Reserved (Zeus)                               | Zeus         | 0x38                          |
 |             0x39 | Zeus Temperature and Humidity Report          | Zeus         | 0x38                          |
 |             0x38 | Zeus Temperature and Humidity Set Poiny       | Zeus         | 0x38                          |
 |        0x35-0x37 | Reserved (Helios)                             | Helios       | 0x34                          |

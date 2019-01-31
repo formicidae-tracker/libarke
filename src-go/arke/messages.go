@@ -121,7 +121,7 @@ func RequestMessage(itf *socketcan.RawInterface, m ReceivableMessage, ID NodeID)
 	return itf.Send(socketcan.CanFrame{
 		ID:       makeCANIDT(StandardMessage, m.MessageClassID(), ID),
 		Extended: false,
-		RTR:      false,
+		RTR:      true,
 		Data:     make([]byte, 0),
 		Dlc:      0,
 	})
