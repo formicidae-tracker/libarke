@@ -1,8 +1,5 @@
 package arke
 
-// #include "../../include/arke.h"
-import "C"
-
 import (
 	"encoding/binary"
 	"fmt"
@@ -36,10 +33,10 @@ func (c *CelaenoSetPoint) Unmarshall(buf []byte) error {
 type WaterLevelStatus uint8
 
 const (
-	CelaenoWaterNominal   WaterLevelStatus = C.ARKE_CELAENO_NOMINAL
-	CelaenoWaterWarning   WaterLevelStatus = C.ARKE_CELAENO_WARNING
-	CelaenoWaterCritical  WaterLevelStatus = C.ARKE_CELAENO_CRITICAL
-	CelaenoWaterReadError WaterLevelStatus = C.ARKE_CELAENO_RO_ERROR
+	CelaenoWaterNominal   WaterLevelStatus = 0x00
+	CelaenoWaterWarning   WaterLevelStatus = 0x01
+	CelaenoWaterCritical  WaterLevelStatus = 0x02
+	CelaenoWaterReadError WaterLevelStatus = 0x04
 )
 
 type CelaenoStatus struct {
@@ -55,9 +52,9 @@ func (c *CelaenoStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 3); err != nil {
 		return err
 	}
-	if (buf[0] & C.ARKE_CELAENO_RO_ERROR) != 0 {
+	if buf[0]&0x04 != 0 {
 		c.WaterLevel = CelaenoWaterReadError
-	} else if buf[0]&C.ARKE_CELAENO_CRITICAL != 0 {
+	} else if buf[0]&0x02 != 0 {
 		c.WaterLevel = CelaenoWaterCritical
 	} else {
 		c.WaterLevel = WaterLevelStatus(buf[0])

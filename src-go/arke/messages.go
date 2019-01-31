@@ -1,7 +1,5 @@
 package arke
 
-// #include "../../include/arke.h"
-import "C"
 import (
 	"fmt"
 
@@ -14,37 +12,37 @@ type NodeClass uint16
 type NodeID uint8
 
 const (
-	NetworkControlCommand MessageType = C.ARKE_NETWORK_CONTROL_COMMAND
-	HighPriorityMessage   MessageType = C.ARKE_HIGH_PRIORITY_MESSAGE
-	StandardMessage       MessageType = C.ARKE_MESSAGE
-	HeartBeat             MessageType = C.ARKE_HEARTBEAT
-	MessageTypeMask       uint16      = C.ARKE_MESSAGE_TYPE_MASK
+	NetworkControlCommand MessageType = 0x00
+	HighPriorityMessage   MessageType = 0x01
+	StandardMessage       MessageType = 0x02
+	HeartBeat             MessageType = 0x03
+	MessageTypeMask       uint16      = 0x03 << 9
 
-	BroadcastClass NodeClass = C.ARKE_BROADCAST
-	ZeusClass      NodeClass = C.ARKE_ZEUS
-	HeliosClass    NodeClass = C.ARKE_HELIOS
-	CelaenoClass   NodeClass = C.ARKE_CELAENO
-	NodeClassMask  uint16    = C.ARKE_NODE_CLASS_MASK
+	BroadcastClass NodeClass = 0x0
+	ZeusClass      NodeClass = 0x38
+	HeliosClass    NodeClass = 0x34
+	CelaenoClass   NodeClass = 0x30
+	NodeClassMask  uint16    = 0x3f << 3
 
-	ResetRequest           MessageClass = C.ARKE_RESET_REQUEST
-	SynchronisationRequest MessageClass = C.ARKE_SYNCHRONISATION
-	HeartBeatRequest       MessageClass = C.ARKE_HEARTBEAT_REQUEST
-	IDMask                 uint16       = C.ARKE_SUBID_MASK
+	ResetRequest           MessageClass = 0x00
+	SynchronisationRequest MessageClass = 0x01
+	HeartBeatRequest       MessageClass = 0x07
+	IDMask                 uint16       = 0x07
 
 	BroadcastID NodeID = 0x00
 
 	HeartBeatMessage           MessageClass = MessageClass(HeartBeat << 9)
-	ZeusSetPointMessage        MessageClass = C.ARKE_ZEUS_SET_POINT
-	ZeusReportMessage          MessageClass = C.ARKE_ZEUS_REPORT
-	ZeusVibrationReportMessage MessageClass = C.ARKE_ZEUS_VIBRATION_REPORT
-	ZeusConfigMessage          MessageClass = C.ARKE_ZEUS_CONFIG
-	ZeusStatusMessage          MessageClass = C.ARKE_ZEUS_STATUS
-	ZeusControlPointMessage    MessageClass = C.ARKE_ZEUS_CONTROL_POINT
-	HeliosSetPointMessage      MessageClass = C.ARKE_HELIOS_SET_POINT
-	HeliosPulseModeMessage     MessageClass = C.ARKE_HELIOS_PULSE_MODE
-	CelaenoSetPointMessage     MessageClass = C.ARKE_CELAENO_SET_POINT
-	CelaenoStatusMessage       MessageClass = C.ARKE_CELAENO_STATUS
-	CelaenoConfigNessage       MessageClass = C.ARKE_CELAENO_CONFIG
+	ZeusSetPointMessage        MessageClass = 0x38
+	ZeusReportMessage          MessageClass = 0x39
+	ZeusVibrationReportMessage MessageClass = 0x3a
+	ZeusConfigMessage          MessageClass = 0x3b
+	ZeusStatusMessage          MessageClass = 0x3c
+	ZeusControlPointMessage    MessageClass = 0x3d
+	HeliosSetPointMessage      MessageClass = 0x34
+	HeliosPulseModeMessage     MessageClass = 0x35
+	CelaenoSetPointMessage     MessageClass = 0x30
+	CelaenoStatusMessage       MessageClass = 0x31
+	CelaenoConfigNessage       MessageClass = 0x32
 )
 
 func makeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {

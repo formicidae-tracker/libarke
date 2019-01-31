@@ -6,9 +6,6 @@ import (
 	"math"
 )
 
-// #include "../../include/arke.h"
-import "C"
-
 type ZeusSetPoint struct {
 	Humidity    float32
 	Temperature float32
@@ -118,9 +115,9 @@ func (m *ZeusConfig) Unmarshall(buf []byte) error {
 }
 
 const (
-	ZeusIdle                         uint8 = C.ARKE_ZEUS_IDLE
-	ZeusActive                       uint8 = C.ARKE_ZEUS_ACTIVE
-	ZeusClimateNotControlledWatchDog uint8 = C.ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD
+	ZeusIdle                         uint8 = 0x00
+	ZeusActive                       uint8 = 0x01
+	ZeusClimateNotControlledWatchDog uint8 = 0x02
 )
 
 type ZeusStatus struct {
