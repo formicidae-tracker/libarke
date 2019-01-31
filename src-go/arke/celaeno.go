@@ -1,5 +1,8 @@
 package arke
 
+// #include "../../include/arke.h"
+import "C"
+
 import (
 	"encoding/binary"
 	"fmt"
@@ -30,8 +33,17 @@ func (c *CelaenoSetPoint) Unmarshall(buf []byte) error {
 	return nil
 }
 
+type WaterLevelStatus uint8
+
+const (
+	CelaenoWaterNominal   WaterLevelStatus = C.ARKE_CELAENO_NOMINAL
+	CelaenoWaterWarning   WaterLevelStatus = C.ARKE_CELAENO_WARNING
+	CelaenoWaterCritical  WaterLevelStatus = C.ARKE_CELAENO_CRITICAL
+	CelaenoWaterReadError WaterLevelStatus = C.ARKE_CELAENO_RO_ERROR
+)
+
 type CelaenoStatus struct {
-	WaterLevel uint8
+	WaterLevel WaterLevelStatus
 	Fan        FanStatusAndRPM
 }
 
@@ -43,7 +55,14 @@ func (c *CelaenoStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 3); err != nil {
 		return err
 	}
-	c.WaterLevel = buf[0]
+	if (buf[0] & C.ARKE_CELAENO_RO_ERROR) != 0 {
+		c.WaterLevel = CelaenoWaterReadError
+	} else if buf[0]&C.ARKE_CELAENO_CRITICAL != 0 {
+		c.WaterLevel = CelaenoWaterCritical
+	} else {
+		c.WaterLevel = WaterLevelStatus(buf[0])
+	}
+
 	c.Fan = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
 	return nil
 }
