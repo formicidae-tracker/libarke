@@ -11,7 +11,7 @@ const (
 type FanStatusAndRPM uint16
 
 func (s FanStatusAndRPM) RPM() uint16 {
-	return uint16(s & 0xc000)
+	return uint16(s & 0x3fff)
 }
 
 func (s FanStatusAndRPM) Status() FanStatus {

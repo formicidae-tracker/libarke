@@ -18,6 +18,6 @@ func (c PDConfig) marshall(buffer []byte) error {
 func (c *PDConfig) unmarshall(buffer []byte) {
 	c.ProportionnalMultiplier = buffer[0]
 	c.DerivativeMultiplier = buffer[1]
-	c.IntegralMultiplier = buf[2]
-	c.DividerPower = buf[2]
+	c.IntegralMultiplier = buffer[2]
+	c.DividerPower = buffer[3]
 }
