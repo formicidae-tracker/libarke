@@ -165,22 +165,20 @@ func (s *ZeusSuite) TestConfigIO(c *C) {
 		{
 			Message: ZeusConfig{
 				Humidity: PDConfig{
-					DeadRegion:              127,
 					ProportionnalMultiplier: 100,
 					DerivativeMultiplier:    50,
-					ProportionalDivider:     1,
-					DerivativeDivider:       2,
+					IntegralMultiplier:      1,
+					DividerPower:            6,
 				},
 				Temperature: PDConfig{
-					DeadRegion:              60,
 					ProportionnalMultiplier: 103,
 					DerivativeMultiplier:    102,
-					ProportionalDivider:     4,
-					DerivativeDivider:       5,
+					IntegralMultiplier:      0,
+					DividerPower:            4,
 				},
 			},
 			Buffer: []byte{
-				127, 100, 50, (2 << 4) | 1, 60, 103, 102, (5 << 4) | 4,
+				100, 50, 1, 6, 103, 102, 0, 4,
 			},
 		},
 	}
@@ -212,24 +210,6 @@ func (s *ZeusSuite) TestConfigIO(c *C) {
 			ZeusConfig{},
 			make([]byte, 0),
 			"Invalid buffer size .*",
-		},
-		{
-			ZeusConfig{
-				Humidity: PDConfig{
-					DerivativeDivider: 16,
-				},
-			},
-			make([]byte, 8),
-			"Maximal Derivative Divider is 15",
-		},
-		{
-			ZeusConfig{
-				Temperature: PDConfig{
-					ProportionalDivider: 16,
-				},
-			},
-			make([]byte, 8),
-			"Maximal Proportional Divider is 15",
 		},
 	}
 

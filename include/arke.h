@@ -66,11 +66,10 @@ typedef struct ArkeZeusReport_t ArkeZeusReport;
 
 
 struct ArkePDConfig_t {
-	uint8_t DeadRegion;
 	uint8_t ProportionalMult;
 	uint8_t DerivativeMult;
-	uint8_t ProportionalDivPower2:4;
-	uint8_t DerivativeDivPower2:4;
+	uint8_t IntegralMult;
+	uint8_t DividerPower;
 } __attribute__((packed));
 
 typedef struct ArkePDConfig_t ArkePDConfig;
