@@ -69,7 +69,8 @@ struct ArkePDConfig_t {
 	uint8_t ProportionalMult;
 	uint8_t DerivativeMult;
 	uint8_t IntegralMult;
-	uint8_t DividerPower;
+	uint8_t DividerPower:4;
+	uint8_t DividerPowerInt:4;
 } __attribute__((packed));
 
 typedef struct ArkePDConfig_t ArkePDConfig;
