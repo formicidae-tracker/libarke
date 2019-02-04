@@ -114,14 +114,18 @@ func (m *ZeusConfig) Unmarshall(buf []byte) error {
 	return nil
 }
 
+type ZeusStatusValue uint8
+
 const (
-	ZeusIdle                         uint8 = 0x00
-	ZeusActive                       uint8 = 0x01
-	ZeusClimateNotControlledWatchDog uint8 = 0x02
+	ZeusIdle                         ZeusStatusValue = 0x00
+	ZeusActive                       ZeusStatusValue = 1 << 0
+	ZeusClimateNotControlledWatchDog ZeusStatusValue = 1 << 1
+	ZeusHumidityUnreachable          ZeusStatusValue = 1 << 2
+	ZeusTemperatureUnreachable       ZeusStatusValue = 1 << 3
 )
 
 type ZeusStatus struct {
-	Status uint8
+	Status ZeusStatusValue
 	Fans   [2]FanStatusAndRPM
 }
 
@@ -133,7 +137,7 @@ func (m *ZeusStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 5); err != nil {
 		return err
 	}
-	m.Status = buf[0]
+	m.Status = ZeusStatusValue(buf[0])
 	m.Fans[0] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
 	m.Fans[1] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[3:]))
 	return nil

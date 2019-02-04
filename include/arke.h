@@ -94,10 +94,10 @@ typedef uint16_t ArkeFanStatus;
 
 
 typedef enum ArkeZeusStatus_e {
-	ARKE_ZEUS_IDLE = 0,
-	ARKE_ZEUS_ACTIVE = (1 << 0),
+	ARKE_ZEUS_IDLE                    = 0,
+	ARKE_ZEUS_ACTIVE                  = (1 << 0),
 	ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD = (1 << 1),
-	ARKE_ZEUS_HUMIDITY_UNREACHABLE = (1 << 2),
+	ARKE_ZEUS_HUMIDITY_UNREACHABLE    = (1 << 2),
 	ARKE_ZEUS_TEMPERATURE_UNREACHABLE = (1 << 3),
 } ArkeZeusStatus_e;
 
