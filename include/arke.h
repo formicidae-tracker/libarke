@@ -65,7 +65,7 @@ struct ArkeZeusReport_t {
 typedef struct ArkeZeusReport_t ArkeZeusReport;
 
 
-struct ArkePDConfig_t {
+struct ArkePIDConfig_t {
 	uint8_t ProportionalMult;
 	uint8_t DerivativeMult;
 	uint8_t IntegralMult;
@@ -73,11 +73,11 @@ struct ArkePDConfig_t {
 	uint8_t DividerPowerInt:4;
 } __attribute__((packed));
 
-typedef struct ArkePDConfig_t ArkePDConfig;
+typedef struct ArkePIDConfig_t ArkePIDConfig;
 
 struct ArkeZeusConfig_t {
-	ArkePDConfig Humidity;
-	ArkePDConfig Temperature;
+	ArkePIDConfig Humidity;
+	ArkePIDConfig Temperature;
 } __attribute__((packed));
 
 typedef struct ArkeZeusConfig_t ArkeZeusConfig;
@@ -92,15 +92,21 @@ typedef struct ArkeZeusConfig_t ArkeZeusConfig;
 
 typedef uint16_t ArkeFanStatus;
 
+
+typedef enum ArkeZeusStatus_e {
+	ARKE_ZEUS_IDLE = 0,
+	ARKE_ZEUS_ACTIVE = (1 << 0),
+	ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD = (1 << 1),
+	ARKE_ZEUS_HUMIDITY_UNREACHABLE = (1 << 2),
+	ARKE_ZEUS_TEMPERATURE_UNREACHABLE = (1 << 3),
+} ArkeZeusStatus_e;
+
 struct ArkeZeusStatus_t {
-	uint8_t       Status;
-	ArkeFanStatus Fan[2];
+	ArkeZeusStatus_e Status;
+	ArkeFanStatus    Fan[2];
 } __attribute__((packed));
 typedef struct ArkeZeusStatus_t ArkeZeusStatus;
 
-#define ARKE_ZEUS_IDLE 0x00
-#define ARKE_ZEUS_ACTIVE 0x01
-#define ARKE_ZEUS_CLIMATE_UNCONTROLLED_WD 0x02
 
 struct ArkeZeusControlPoint_t {
 	int16_t Humidity;
