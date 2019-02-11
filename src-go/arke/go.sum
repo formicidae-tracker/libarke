@@ -1,5 +1,7 @@
 github.com/atuleu/golang-socketcan v0.1.0 h1:LHQAmYuAQNCY07Rsw2ca5o8DGbcDE1M2w+7j/9TBYm8=
 github.com/atuleu/golang-socketcan v0.1.0/go.mod h1:K0cVB6d80dD70kgvSKVtS3Ue887mEkiUI5KPwkh8RKw=
+github.com/atuleu/golang-socketcan v0.1.1 h1:iu/HnUjEyiaUvXnNFXAXF4cZV9idzSrPizlMedCgiQc=
+github.com/atuleu/golang-socketcan v0.1.1/go.mod h1:K0cVB6d80dD70kgvSKVtS3Ue887mEkiUI5KPwkh8RKw=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
