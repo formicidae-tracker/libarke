@@ -91,7 +91,7 @@ func checkID(ID NodeID) error {
 	return nil
 }
 
-func SendMessage(itf *socketcan.RawInterface, m SendableMessage, highPriority bool, ID NodeID) error {
+func SendMessage(itf socketcan.RawInterface, m SendableMessage, highPriority bool, ID NodeID) error {
 	if err := checkID(ID); err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func SendMessage(itf *socketcan.RawInterface, m SendableMessage, highPriority bo
 	return itf.Send(f)
 }
 
-func RequestMessage(itf *socketcan.RawInterface, m ReceivableMessage, ID NodeID) error {
+func RequestMessage(itf socketcan.RawInterface, m ReceivableMessage, ID NodeID) error {
 	if err := checkID(ID); err != nil {
 		return err
 	}

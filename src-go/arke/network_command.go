@@ -8,7 +8,7 @@ import (
 	socketcan "github.com/atuleu/golang-socketcan"
 )
 
-func SendResetRequest(itf *socketcan.RawInterface, c NodeClass, ID NodeID) error {
+func SendResetRequest(itf socketcan.RawInterface, c NodeClass, ID NodeID) error {
 	return itf.Send(socketcan.CanFrame{
 		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(ResetRequest)),
 		Dlc:      1,
@@ -21,7 +21,7 @@ func SendResetRequest(itf *socketcan.RawInterface, c NodeClass, ID NodeID) error
 	})
 }
 
-func Ping(itf *socketcan.RawInterface, c NodeClass) error {
+func Ping(itf socketcan.RawInterface, c NodeClass) error {
 	return itf.Send(socketcan.CanFrame{
 		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(HeartBeatRequest)),
 		Dlc:      0,
@@ -31,7 +31,7 @@ func Ping(itf *socketcan.RawInterface, c NodeClass) error {
 	})
 }
 
-func SendHeartBeatRequest(itf *socketcan.RawInterface, c NodeClass, t time.Duration) error {
+func SendHeartBeatRequest(itf socketcan.RawInterface, c NodeClass, t time.Duration) error {
 	period, err := castDuration(t)
 	if err != nil {
 		return err
