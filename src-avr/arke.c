@@ -107,8 +107,11 @@ void ProcessControl() {
 	uint8_t dataLength = arke.control.length;
 	// we are forbidden to access any yaacl function here
 
-	if ( command == ARKE_RESET_REQUEST ) {
-		ArkeSoftwareReset();
+	if ( command == ARKE_RESET_REQUEST && dataLength == 1 ) {
+		uint8_t targetID = arke.controlData[0];
+		if ( targetID == 0 || targetID == ARKE_MY_SUBID) {
+			ArkeSoftwareReset();
+		}
 	}
 
 	if ( command == ARKE_HEARTBEAT_REQUEST ) {

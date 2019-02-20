@@ -8,13 +8,16 @@ import (
 	socketcan "github.com/atuleu/golang-socketcan"
 )
 
-func SendResetRequest(itf *socketcan.RawInterface, c NodeClass) error {
+func SendResetRequest(itf *socketcan.RawInterface, c NodeClass, ID NodeID) error {
 	return itf.Send(socketcan.CanFrame{
 		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(ResetRequest)),
-		Dlc:      0,
+		Dlc:      1,
 		Extended: false,
 		RTR:      false,
-		Data:     nil,
+		Data: []byte{
+			byte(ID), 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+		},
 	})
 }
 
