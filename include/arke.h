@@ -103,7 +103,7 @@ typedef enum ArkeZeusStatus_e {
 
 struct ArkeZeusStatus_t {
 	ArkeZeusStatus_e Status;
-	ArkeFanStatus    Fan[2];
+	ArkeFanStatus    Fan[3];
 } __attribute__((packed));
 typedef struct ArkeZeusStatus_t ArkeZeusStatus;
 

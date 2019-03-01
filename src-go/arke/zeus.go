@@ -126,7 +126,7 @@ const (
 
 type ZeusStatus struct {
 	Status ZeusStatusValue
-	Fans   [2]FanStatusAndRPM
+	Fans   [3]FanStatusAndRPM
 }
 
 func (m *ZeusStatus) MessageClassID() MessageClass {
@@ -140,6 +140,7 @@ func (m *ZeusStatus) Unmarshall(buf []byte) error {
 	m.Status = ZeusStatusValue(buf[0])
 	m.Fans[0] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
 	m.Fans[1] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[3:]))
+	m.Fans[2] = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[5:]))
 	return nil
 }
 

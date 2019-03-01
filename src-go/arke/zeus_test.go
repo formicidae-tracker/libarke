@@ -230,13 +230,14 @@ func (s *ZeusSuite) TestStatusIO(c *C) {
 		{
 			Message: ZeusStatus{
 				Status: ZeusIdle,
-				Fans: [2]FanStatusAndRPM{
+				Fans: [3]FanStatusAndRPM{
 					1200,
 					FanStatusAndRPM(0 | (uint16(FanStalled) << 14)),
+					FanStatusAndRPM(400 | (uint16(FanAging) << 14)),
 				},
 			},
 			Buffer: []byte{
-				0, 0xb0, 0x04, 0x00, 0x80,
+				0, 0xb0, 0x04, 0x00, 0x80, 0x90, 0x41,
 			},
 		},
 	}
