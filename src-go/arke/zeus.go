@@ -162,10 +162,40 @@ func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
 	return nil
 }
 
+type ZeusDeltaTemperature struct {
+	Delta [4]float32
+}
+
+func (m *ZeusDeltaTemperature) MessageClassID() MessageClass {
+	return ZeusDeltaTemperatureMessage
+}
+
+func (m *ZeusDeltaTemperature) Marshall(buf []byte) (int, error) {
+	binary.LittleEndian.PutUint16(buf[0:], uint16(int16(m.Delta[0]*float32(hih6030Max)/165.0)))
+	for i := 1; i < 4; i++ {
+		binary.LittleEndian.PutUint16(buf[(2*i):], uint16(int16(m.Delta[i]/0.0625)))
+	}
+	return 8, nil
+}
+
+func (m *ZeusDeltaTemperature) Unmarshall(buf []byte) error {
+	if err := checkSize(buf, 8); err != nil {
+		return err
+	}
+
+	m.Delta[0] = float32(int16(binary.LittleEndian.Uint16(buf[0:]))) * 165.0 / float32(hih6030Max)
+	for i := 1; i < 4; i++ {
+		m.Delta[i] = float32(int16(binary.LittleEndian.Uint16(buf[(2*i):]))) * 0.0625
+	}
+
+	return nil
+}
+
 func init() {
 	messageFactory[ZeusSetPointMessage] = func() ReceivableMessage { return &ZeusSetPoint{} }
 	messageFactory[ZeusReportMessage] = func() ReceivableMessage { return &ZeusReport{} }
 	messageFactory[ZeusConfigMessage] = func() ReceivableMessage { return &ZeusConfig{} }
 	messageFactory[ZeusStatusMessage] = func() ReceivableMessage { return &ZeusStatus{} }
 	messageFactory[ZeusControlPointMessage] = func() ReceivableMessage { return &ZeusControlPoint{} }
+	messageFactory[ZeusDeltaTemperatureMessage] = func() ReceivableMessage { return &ZeusDeltaTemperature{} }
 }

@@ -309,3 +309,47 @@ func (s *ZeusSuite) TestControlPointIO(c *C) {
 	}
 
 }
+
+func (s *ZeusSuite) TestTemperatureDelta(c *C) {
+	testData := []struct {
+		Message ZeusDeltaTemperature
+		Buffer  []byte
+	}{
+		{
+			Message: ZeusDeltaTemperature{
+				Delta: [4]float32{0, 0, 0, 0},
+			},
+			Buffer: []byte{
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			},
+		},
+		{
+			Message: ZeusDeltaTemperature{
+				Delta: [4]float32{-0.75540227078, 2.625, -1, 0},
+			},
+			Buffer: []byte{
+				0xb5, 0xff, 42, 0x00, 0xf0, 0xff, 0x00, 0x00,
+			},
+		},
+	}
+
+	for _, d := range testData {
+		m := ZeusDeltaTemperature{}
+		err := m.Unmarshall(d.Buffer)
+		if c.Check(err, IsNil) == false {
+			continue
+		}
+		c.Check(m, DeepEquals, d.Message)
+	}
+
+	for _, d := range testData {
+		res := make([]byte, 8)
+		n, err := d.Message.Marshall(res)
+		if c.Check(err, IsNil) == false {
+			continue
+		}
+		c.Check(n, Equals, 8)
+		c.Check(res, DeepEquals, d.Buffer)
+	}
+
+}

@@ -31,18 +31,19 @@ const (
 
 	BroadcastID NodeID = 0x00
 
-	HeartBeatMessage           MessageClass = MessageClass(HeartBeat << 9)
-	ZeusSetPointMessage        MessageClass = 0x38
-	ZeusReportMessage          MessageClass = 0x39
-	ZeusVibrationReportMessage MessageClass = 0x3a
-	ZeusConfigMessage          MessageClass = 0x3b
-	ZeusStatusMessage          MessageClass = 0x3c
-	ZeusControlPointMessage    MessageClass = 0x3d
-	HeliosSetPointMessage      MessageClass = 0x34
-	HeliosPulseModeMessage     MessageClass = 0x35
-	CelaenoSetPointMessage     MessageClass = 0x30
-	CelaenoStatusMessage       MessageClass = 0x31
-	CelaenoConfigNessage       MessageClass = 0x32
+	HeartBeatMessage            MessageClass = MessageClass(HeartBeat << 9)
+	ZeusSetPointMessage         MessageClass = 0x38
+	ZeusReportMessage           MessageClass = 0x39
+	ZeusVibrationReportMessage  MessageClass = 0x3a
+	ZeusConfigMessage           MessageClass = 0x3b
+	ZeusStatusMessage           MessageClass = 0x3c
+	ZeusControlPointMessage     MessageClass = 0x3d
+	ZeusDeltaTemperatureMessage MessageClass = 0x3e
+	HeliosSetPointMessage       MessageClass = 0x34
+	HeliosPulseModeMessage      MessageClass = 0x35
+	CelaenoSetPointMessage      MessageClass = 0x30
+	CelaenoStatusMessage        MessageClass = 0x31
+	CelaenoConfigNessage        MessageClass = 0x32
 )
 
 func makeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {
