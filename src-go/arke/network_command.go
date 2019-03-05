@@ -48,6 +48,23 @@ func SendHeartBeatRequest(itf socketcan.RawInterface, c NodeClass, t time.Durati
 	return itf.Send(f)
 }
 
+func SendIDChangeRequest(itf socketcan.RawInterface, c NodeClass, original, new NodeID) error {
+	if original == 0 || original > 7 {
+		return fmt.Errorf("Invalid Original ID %d", original)
+	}
+	if new == 0 || new > 7 {
+		return fmt.Errorf("Invalid Target ID %d", new)
+	}
+
+	return itf.Send(socketcan.CanFrame{
+		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(IDChangeRequest)),
+		Dlc:      2,
+		Extended: false,
+		RTR:      false,
+		Data:     []byte{byte(original), byte(new)},
+	})
+}
+
 type HeartBeatData struct {
 	Class        NodeClass
 	ID           NodeID

@@ -198,6 +198,7 @@ implementation is not necesarly required
 |-------|---------------------------|----------------|
 | 0b000 | Software Reset Request    | Required       |
 | 0b001 | Timestamp Synchrnoization | Optional       |
+| 0b010 | Node ID Change            | Required       |
 | 0b111 | Heartbeat Request         | Required       |
 
 As these message are broadcasted, the RTR beat should always be set to

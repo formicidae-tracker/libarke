@@ -1,8 +1,12 @@
+#include <avr/eeprom.h>
+#include <avr/interrupt.h>
+
 #include <arke-avr.h>
 #include <arke-avr/systime.h>
 
-#include <yaacl.h>
 
+
+#include <yaacl.h>
 
 
 #if defined(ARKE_MY_FW_TWEAK_VERSION)
@@ -16,7 +20,7 @@
 #ifndef ARKE_MY_SIZE
 #error "Please define ARKE_MY_SIZE"
 #else
-#define ARKE_RX_IDT ( (ARKE_MESSAGE << 9) | (ARKE_MY_CLASS << 3) | ARKE_MY_SUBID)
+#define ARKE_RX_IDT(ID_) ( (ARKE_MESSAGE << 9) | (ARKE_MY_CLASS << 3) | (ID_))
 #define ARKE_RX_IDT_MASK (ARKE_MESSAGE_TYPE_MASK | ((~(ARKE_MY_SIZE - 1) & 0x3f) << 3) | 0x07 )
 #define ARKE_RX_BROAD_MASK (ARKE_MESSAGE_TYPE_MASK | ((~(ARKE_MY_SIZE - 1) & 0x3f) << 3))
 #endif
@@ -39,17 +43,18 @@ typedef struct ArkeData_t {
 	ArkeHeartbeatStatus_e heartbeatStatus;
 	ArkeSystime_t heartbeatPeriod;
 	ArkeSystime_t lastHeartbeat;
+	uint8_t ID;
 } ArkeData_t;
 
-#define arke_prepare_rx_txn() do {	  \
-		yaacl_make_std_idt(arke.rx.ID,ARKE_RX_IDT,0); \
+#define arke_prepare_rx_txn(ID_) do {	  \
+		yaacl_make_std_idt(arke.rx.ID,ARKE_RX_IDT(ID_),0); \
 		yaacl_make_std_mask(arke.rx.mask,ARKE_RX_IDT_MASK,0,1); \
 		arke.rx.length = arke.rxLength; \
 		arke.rx.data = arke.rxBuffer; \
 	}while(0);
 
-#define arke_prepare_broadcast_txn() do {	  \
-		yaacl_make_std_idt(arke.broadcast.ID,ARKE_RX_IDT,0); \
+#define arke_prepare_broadcast_txn(ID_) do {	  \
+		yaacl_make_std_idt(arke.broadcast.ID,ARKE_RX_IDT(ID_),0); \
 		yaacl_make_std_mask(arke.broadcast.mask,ARKE_RX_BROAD_MASK,0,1); \
 		arke.broadcast.length = arke.rxLength; \
 		arke.broadcast.data = arke.rxBuffer; \
@@ -58,7 +63,18 @@ typedef struct ArkeData_t {
 
 ArkeData_t arke;
 
+uint8_t EEMEM arkeID = 1;
+
+
 void InitArke(uint8_t * rxBuffer, uint8_t length) {
+	uint8_t sreg = SREG;
+	cli();
+	arke.ID = eeprom_read_byte(&arkeID);
+	if ( arke.ID == 0 || arke.ID > 7 ) {
+		arke.ID = 1;
+	}
+	SREG = sreg;
+
 	arke.heartbeatData[0] = ARKE_MY_FW_MAJOR_VERSION;
 	arke.heartbeatData[1] = ARKE_MY_FW_MINOR_VERSION;
 #if VERSION_LENGTH > 2
@@ -88,13 +104,13 @@ void InitArke(uint8_t * rxBuffer, uint8_t length) {
 	arke.control.length = 8;
 	arke.control.data = &(arke.controlData[0]);
 
-	arke.heartbeat.ID = (ARKE_HEARTBEAT << 9 ) | (ARKE_MY_CLASS << 3) | ARKE_MY_SUBID;
+	arke.heartbeat.ID = (ARKE_HEARTBEAT << 9 ) | (ARKE_MY_CLASS << 3) | arke.ID;
 	arke.heartbeat.data = &(arke.heartbeatData[0]);
 
 	arke.rxLength = length;
 	arke.rxBuffer = rxBuffer;
-	arke_prepare_rx_txn();
-	arke_prepare_broadcast_txn();
+	arke_prepare_rx_txn(arke.ID);
+	arke_prepare_broadcast_txn(arke.ID);
 
 	yaacl_listen(&arke.control);
 	yaacl_listen(&arke.broadcast);
@@ -109,9 +125,10 @@ void ProcessControl() {
 
 	if ( command == ARKE_RESET_REQUEST && dataLength == 1 ) {
 		uint8_t targetID = arke.controlData[0];
-		if ( targetID == 0 || targetID == ARKE_MY_SUBID) {
+		if ( targetID == 0 || targetID == arke.ID) {
 			ArkeSoftwareReset();
 		}
+		return;
 	}
 
 	if ( command == ARKE_HEARTBEAT_REQUEST ) {
@@ -133,7 +150,20 @@ void ProcessControl() {
 		return;
 	}
 
+	if ( command == ARKE_ID_CHANGE_REQUEST
+	     && dataLength == 2
+	     && arke.controlData[0] == arke.ID
+	     && arke.controlData[1] > 0
+	     && arke.controlData[1] < 8 ) {
+		arke.ID = arke.controlData[1];
+		uint8_t sreg = SREG;
+		cli();
+		eeprom_update_byte(&arkeID,arke.ID);
+		SREG = sreg;
+		return;
+	}
 }
+
 yaacl_idt_t ArkeProcessNodeMessage(uint8_t * length) {
 	yaacl_txn_status_e s = yaacl_txn_status(&arke.rx);
 	yaacl_idt_t ret = ARKE_NO_MESSAGE;
@@ -143,7 +173,7 @@ yaacl_idt_t ArkeProcessNodeMessage(uint8_t * length) {
 	}
 
 	if ( s != YAACL_TXN_PENDING ) {
-		arke_prepare_rx_txn();
+		arke_prepare_rx_txn(arke.ID);
 		yaacl_listen(&arke.rx);
 	}
 	if ( ret != ARKE_NO_MESSAGE) {
@@ -158,7 +188,7 @@ yaacl_idt_t ArkeProcessNodeMessage(uint8_t * length) {
 	}
 
 	if ( s != YAACL_TXN_PENDING ) {
-		arke_prepare_broadcast_txn();
+		arke_prepare_broadcast_txn(arke.ID);
 		yaacl_listen(&arke.broadcast);
 	}
 
@@ -218,7 +248,7 @@ yaacl_idt_t ArkeProcess(uint8_t * length) {
 
 #define implement_sender_function(name) \
 	ARKE_DECLARE_SENDER_FUNCTION(name) { \
-		txn->ID = ARKE_MY_SUBID \
+		txn->ID = arke.ID \
 			| ( Arke ## name ## ClassValue << 3) \
 			| ( (emergency ? ARKE_HIGH_PRIORITY_MESSAGE : ARKE_MESSAGE) << 9) ; \
 		txn->length = sizeof(Arke ## name); \

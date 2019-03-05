@@ -13,6 +13,9 @@ void InitArke(uint8_t * rxBuffer, uint8_t length);
 
 yaacl_idt_t ArkeProcess(uint8_t * length);
 
+
+uint8_t ArkeMyID();
+
 void ArkeSoftwareReset();
 
 #include <avr/wdt.h>

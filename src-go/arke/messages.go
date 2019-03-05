@@ -26,6 +26,7 @@ const (
 
 	ResetRequest           MessageClass = 0x00
 	SynchronisationRequest MessageClass = 0x01
+	IDChangeRequest        MessageClass = 0x02
 	HeartBeatRequest       MessageClass = 0x07
 	IDMask                 uint16       = 0x07
 
