@@ -30,6 +30,10 @@ func (c *CelaenoSetPoint) Unmarshall(buf []byte) error {
 	return nil
 }
 
+func (c *CelaenoSetPoint) String() string {
+	return fmt.Sprintf("Celaeno.SetPoint{Power: %d}", c.Power)
+}
+
 type WaterLevelStatus uint8
 
 const (
@@ -62,6 +66,27 @@ func (c *CelaenoStatus) Unmarshall(buf []byte) error {
 
 	c.Fan = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
 	return nil
+}
+
+func (s WaterLevelStatus) String() string {
+	if s == CelaenoWaterReadError {
+		return "readout-error"
+	}
+	prefix := ""
+	if s&CelaenoWaterReadError != 0 {
+		prefix = "readout-error|"
+	}
+	if s&CelaenoWaterCritical != 0 {
+		return prefix + "critical"
+	}
+	if s&CelaenoWaterWarning != 0 {
+		return prefix + "warning"
+	}
+	return prefix + "nominal"
+}
+
+func (c *CelaenoStatus) String() string {
+	return fmt.Sprintf("Celaeno.Status{WaterLevel: %s, Fan:%s}", c.WaterLevel, c.Fan)
 }
 
 type CelaenoConfig struct {
@@ -108,6 +133,14 @@ func (c *CelaenoConfig) Unmarshall(buf []byte) error {
 	c.MinimumOnTime = time.Duration(binary.LittleEndian.Uint16(buf[4:])) * time.Millisecond
 	c.DebounceTime = time.Duration(binary.LittleEndian.Uint16(buf[6:])) * time.Millisecond
 	return nil
+}
+
+func (c *CelaenoConfig) String() string {
+	return fmt.Sprintf("Celaeno.Config{RampUp: %s, RampDown: %s, MinimumOn: %s, Debounce: %s}",
+		c.RampUpTime,
+		c.RampDownTime,
+		c.MinimumOnTime,
+		c.DebounceTime)
 }
 
 func init() {

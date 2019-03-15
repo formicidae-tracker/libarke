@@ -49,6 +49,11 @@ func (m *ZeusSetPoint) Unmarshall(buf []byte) error {
 	return nil
 }
 
+func (sp *ZeusSetPoint) String() string {
+	return fmt.Sprintf("Zeus.SetPoint{Humidity: %.2f%%, Temperature: %.2f°C, Wind: %d}",
+		sp.Humidity, sp.Temperature, sp.Wind)
+}
+
 type ZeusReport struct {
 	Humidity    float32
 	Temperature [4]float32
@@ -83,9 +88,19 @@ func (m *ZeusReport) Unmarshall(buf []byte) error {
 	return nil
 }
 
+func (sp *ZeusReport) String() string {
+	return fmt.Sprintf("Zeus.Report{Humidity: %.2f%%, Ant: %.2f°C, Aux1: %.2f°C, Aux2: %.2f°C, Aux3: %.2f°C}",
+		sp.Humidity, sp.Temperature[0], sp.Temperature[1], sp.Temperature[2], sp.Temperature[3])
+}
+
 type ZeusConfig struct {
 	Humidity    PDConfig
 	Temperature PDConfig
+}
+
+func (c *ZeusConfig) String() string {
+	return fmt.Sprintf("Zeus.Config{Humidity:%s, Temperature:%s}",
+		c.Humidity, c.Temperature)
 }
 
 func (m *ZeusConfig) MessageClassID() MessageClass {
@@ -129,12 +144,41 @@ type ZeusStatus struct {
 	Fans   [3]FanStatusAndRPM
 }
 
+func (s ZeusStatusValue) String() string {
+	prefix := ""
+	if s&ZeusTemperatureUnreachable != 0 {
+		prefix += "temperature-unreachable|"
+	}
+	if s&ZeusHumidityUnreachable != 0 {
+		prefix += "humidity-unreachable|"
+	}
+	if s&ZeusClimateNotControlledWatchDog != 0 {
+		if s&ZeusActive != 0 {
+			return prefix + "sensor-issue"
+		}
+		prefix += "climate-uncontrolled|"
+	}
+	if s&ZeusActive != 0 {
+		return prefix + "active"
+	}
+	return prefix + "idle"
+}
+
+func (s *ZeusStatus) String() string {
+	return fmt.Sprintf("Zeus.Status{General: %s, WindFan: %s, LeftFan: %s, RightFan: %s}",
+		s.Status,
+		s.Fans[0],
+		s.Fans[2],
+		s.Fans[1],
+	)
+}
+
 func (m *ZeusStatus) MessageClassID() MessageClass {
 	return ZeusStatusMessage
 }
 
 func (m *ZeusStatus) Unmarshall(buf []byte) error {
-	if err := checkSize(buf, 5); err != nil {
+	if err := checkSize(buf, 7); err != nil {
 		return err
 	}
 	m.Status = ZeusStatusValue(buf[0])
@@ -147,6 +191,13 @@ func (m *ZeusStatus) Unmarshall(buf []byte) error {
 type ZeusControlPoint struct {
 	Humidity    int16
 	Temperature int16
+}
+
+func (cp *ZeusControlPoint) String() string {
+	return fmt.Sprintf("Zeus.ControlPoint{Humidity: %d, Temperature: %d}",
+		cp.Humidity,
+		cp.Temperature,
+	)
 }
 
 func (m *ZeusControlPoint) MessageClassID() MessageClass {
@@ -164,6 +215,15 @@ func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
 
 type ZeusDeltaTemperature struct {
 	Delta [4]float32
+}
+
+func (d *ZeusDeltaTemperature) String() string {
+	return fmt.Sprintf("Zeus.DeltaTemperature{Ants: %.4f°C, Aux1: %.4f°C, Aux2: %.4f°C, Aux3: %.4f°C}",
+		d.Delta[0],
+		d.Delta[1],
+		d.Delta[2],
+		d.Delta[3],
+	)
 }
 
 func (m *ZeusDeltaTemperature) MessageClassID() MessageClass {

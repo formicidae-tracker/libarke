@@ -9,6 +9,10 @@ var nameByClass = make(map[NodeClass]string)
 
 var classByName = make(map[string]NodeClass)
 
+func (c NodeClass) String() string {
+	return ClassName(c)
+}
+
 func ClassName(c NodeClass) string {
 	if n, ok := nameByClass[c]; ok == true {
 		return n

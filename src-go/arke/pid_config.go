@@ -32,3 +32,12 @@ func (c *PDConfig) unmarshall(buffer []byte) {
 	c.DividerPower = buffer[3] & 0x0f
 	c.DividerPowerIntegral = (buffer[3] & 0xf0) >> 4
 }
+
+func (c PDConfig) String() string {
+	return fmt.Sprintf(
+		"PIDConfig{Proportional:%d/%d, Derivative: %d/%d, Integral: %d/%d}",
+		c.ProportionnalMultiplier, (1 << c.DividerPower),
+		c.DerivativeMultiplier, (1 << c.DividerPower),
+		c.IntegralMultiplier, (1 << c.DividerPowerIntegral),
+	)
+}

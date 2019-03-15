@@ -1,5 +1,7 @@
 package arke
 
+import "fmt"
+
 type FanStatus uint8
 
 const (
@@ -22,4 +24,18 @@ func (s FanStatusAndRPM) Status() FanStatus {
 	} else {
 		return FanOK
 	}
+}
+
+func (s FanStatus) String() string {
+	if s == FanOK {
+		return "OK"
+	}
+	if s == FanAging {
+		return "Aging"
+	}
+	return "Stalled"
+}
+
+func (s FanStatusAndRPM) String() string {
+	return fmt.Sprintf("{Status: %s, RPM: %d}", s.Status(), s.RPM())
 }

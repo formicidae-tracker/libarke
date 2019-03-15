@@ -1,5 +1,7 @@
 package arke
 
+import "fmt"
+
 type HeliosSetPoint struct {
 	Visible uint8
 	UV      uint8
@@ -25,6 +27,10 @@ func (c *HeliosSetPoint) Unmarshall(buf []byte) error {
 
 func (m *HeliosSetPoint) MessageClassID() MessageClass {
 	return HeliosSetPointMessage
+}
+
+func (c *HeliosSetPoint) String() string {
+	return fmt.Sprintf("Helios.SetPoint{Visible: %d, UV: %d}", c.Visible, c.UV)
 }
 
 func init() {

@@ -78,6 +78,7 @@ type SendableMessage interface {
 type ReceivableMessage interface {
 	Unmarshaller
 	identifiable
+	String() string
 }
 
 type Message interface {

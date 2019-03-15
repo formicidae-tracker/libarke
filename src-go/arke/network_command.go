@@ -98,6 +98,20 @@ func (h *HeartBeatData) Unmarshall(buf []byte) error {
 	return nil
 }
 
+func (h *HeartBeatData) String() string {
+	if h.MajorVersion == 0 && h.MinorVersion == 0 && h.PatchVersion == 0 && h.TweakVersion == 0 {
+		return fmt.Sprintf("arke.HeartBeat{Class: %s, ID: %d}", ClassName(h.Class), h.ID)
+	}
+
+	return fmt.Sprintf("arke.HeartBeat{Class: %s, ID: %d, Version: %d.%d.%d.%d}",
+		ClassName(h.Class),
+		h.ID,
+		h.MajorVersion,
+		h.MinorVersion,
+		h.PatchVersion,
+		h.TweakVersion)
+}
+
 func (h *HeartBeatData) MessageClassID() MessageClass {
 	return HeartBeatMessage
 }
