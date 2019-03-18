@@ -34,11 +34,11 @@ const (
 	BroadcastID NodeID = 0x00
 
 	HeartBeatMessage              MessageClass = MessageClass(HeartBeat << 9)
-	ResetRequestMessage           MessageClass = MessageClass(ResetRequest << 9)
-	SynchronisationRequestMessage MessageClass = MessageClass(SynchronisationRequest << 9)
-	IDChangeRequestMessage        MessageClass = MessageClass(IDChangeRequest << 9)
-	ErrorReportMessage            MessageClass = MessageClass(ErrorReport << 9)
-	HeartBeatRequestMessage       MessageClass = MessageClass(HeartBeatRequest << 9)
+	ResetRequestMessage           MessageClass = MessageClass(0x7f8 | ResetRequest)
+	SynchronisationRequestMessage MessageClass = MessageClass(0x7f8 | SynchronisationRequest)
+	IDChangeRequestMessage        MessageClass = MessageClass(0x7f8 | IDChangeRequest)
+	ErrorReportMessage            MessageClass = MessageClass(0x7f8 | ErrorReport)
+	HeartBeatRequestMessage       MessageClass = MessageClass(0x7f8 | HeartBeatRequest)
 	ZeusSetPointMessage           MessageClass = 0x38
 	ZeusReportMessage             MessageClass = 0x39
 	ZeusVibrationReportMessage    MessageClass = 0x3a
