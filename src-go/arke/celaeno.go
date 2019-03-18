@@ -97,7 +97,7 @@ type CelaenoConfig struct {
 }
 
 func (m *CelaenoConfig) MessageClassID() MessageClass {
-	return CelaenoConfigNessage
+	return CelaenoConfigMessage
 }
 
 const MaxUint16 = ^uint16(0)
@@ -146,5 +146,5 @@ func (c *CelaenoConfig) String() string {
 func init() {
 	messageFactory[CelaenoSetPointMessage] = func() ReceivableMessage { return &CelaenoSetPoint{} }
 	messageFactory[CelaenoStatusMessage] = func() ReceivableMessage { return &CelaenoStatus{} }
-	messageFactory[CelaenoConfigNessage] = func() ReceivableMessage { return &CelaenoConfig{} }
+	messageFactory[CelaenoConfigMessage] = func() ReceivableMessage { return &CelaenoConfig{} }
 }

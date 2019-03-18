@@ -22,6 +22,7 @@ func (s *ClassSuite) TestNameMapping(c *C) {
 		{Name: "celaeno", Class: CelaenoClass},
 		{Name: "Helios", Class: HeliosClass},
 		{Name: "helios", Class: HeliosClass},
+		{Name: "Broadcast", Class: 0},
 	}
 
 	for _, d := range testdata {
@@ -37,5 +38,5 @@ func (s *ClassSuite) TestNameMapping(c *C) {
 	_, err := Class("hades")
 	c.Check(err, ErrorMatches, `Unknown node class 'hades'`)
 
-	c.Check(ClassName(NodeClass(0)), Equals, "<unknown>")
+	c.Check(ClassName(NodeClass(1)), Equals, "<unknown>")
 }

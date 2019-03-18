@@ -31,6 +31,7 @@ func init() {
 	nameByClass[ZeusClass] = "Zeus"
 	nameByClass[CelaenoClass] = "Celaeno"
 	nameByClass[HeliosClass] = "Helios"
+	nameByClass[0] = "Broadcast"
 
 	for c, n := range nameByClass {
 		classByName[strings.ToLower(n)] = c

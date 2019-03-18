@@ -211,6 +211,16 @@ func (s *ZeusSuite) TestConfigIO(c *C) {
 			make([]byte, 0),
 			"Invalid buffer size .*",
 		},
+		{
+			ZeusConfig{PDConfig{0, 0, 0, 16, 0}, PDConfig{}},
+			make([]byte, 8),
+			"Maximal Proportional&Derivative Divider is 15",
+		},
+		{
+			ZeusConfig{PDConfig{}, PDConfig{0, 0, 0, 0, 16}},
+			make([]byte, 8),
+			"Maximal Integral Divider is 15",
+		},
 	}
 
 	for _, d := range errorData {
@@ -351,5 +361,8 @@ func (s *ZeusSuite) TestTemperatureDelta(c *C) {
 		c.Check(n, Equals, 8)
 		c.Check(res, DeepEquals, d.Buffer)
 	}
+
+	m := ZeusDeltaTemperature{}
+	c.Check(m.Unmarshall([]byte{}), ErrorMatches, "Invalid buffer size .*")
 
 }

@@ -27,24 +27,30 @@ const (
 	ResetRequest           MessageClass = 0x00
 	SynchronisationRequest MessageClass = 0x01
 	IDChangeRequest        MessageClass = 0x02
+	ErrorReport            MessageClass = 0x03
 	HeartBeatRequest       MessageClass = 0x07
 	IDMask                 uint16       = 0x07
 
 	BroadcastID NodeID = 0x00
 
-	HeartBeatMessage            MessageClass = MessageClass(HeartBeat << 9)
-	ZeusSetPointMessage         MessageClass = 0x38
-	ZeusReportMessage           MessageClass = 0x39
-	ZeusVibrationReportMessage  MessageClass = 0x3a
-	ZeusConfigMessage           MessageClass = 0x3b
-	ZeusStatusMessage           MessageClass = 0x3c
-	ZeusControlPointMessage     MessageClass = 0x3d
-	ZeusDeltaTemperatureMessage MessageClass = 0x3e
-	HeliosSetPointMessage       MessageClass = 0x34
-	HeliosPulseModeMessage      MessageClass = 0x35
-	CelaenoSetPointMessage      MessageClass = 0x30
-	CelaenoStatusMessage        MessageClass = 0x31
-	CelaenoConfigNessage        MessageClass = 0x32
+	HeartBeatMessage              MessageClass = MessageClass(HeartBeat << 9)
+	ResetRequestMessage           MessageClass = MessageClass(ResetRequest << 9)
+	SynchronisationRequestMessage MessageClass = MessageClass(SynchronisationRequest << 9)
+	IDChangeRequestMessage        MessageClass = MessageClass(IDChangeRequest << 9)
+	ErrorReportMessage            MessageClass = MessageClass(ErrorReport << 9)
+	HeartBeatRequestMessage       MessageClass = MessageClass(HeartBeatRequest << 9)
+	ZeusSetPointMessage           MessageClass = 0x38
+	ZeusReportMessage             MessageClass = 0x39
+	ZeusVibrationReportMessage    MessageClass = 0x3a
+	ZeusConfigMessage             MessageClass = 0x3b
+	ZeusStatusMessage             MessageClass = 0x3c
+	ZeusControlPointMessage       MessageClass = 0x3d
+	ZeusDeltaTemperatureMessage   MessageClass = 0x3e
+	HeliosSetPointMessage         MessageClass = 0x34
+	HeliosPulseModeMessage        MessageClass = 0x35
+	CelaenoSetPointMessage        MessageClass = 0x30
+	CelaenoStatusMessage          MessageClass = 0x31
+	CelaenoConfigMessage          MessageClass = 0x32
 )
 
 func makeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {
@@ -134,9 +140,13 @@ type messageCreator func() ReceivableMessage
 
 var messageFactory = make(map[MessageClass]messageCreator)
 
+type networkCommandParser func(c MessageClass, buffer []byte) (ReceivableMessage, NodeID, error)
+
+var networkCommandFactory = make(map[NodeID]networkCommandParser)
+
 func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 	if f.Extended == true {
-		return nil, 0, fmt.Errorf("Arke does not support extended can ID")
+		return nil, 0, fmt.Errorf("Arke does not support extended IDT")
 	}
 
 	if f.RTR == true {
@@ -145,7 +155,11 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 
 	mType, mClass, mID := extractCANIDT(f.ID)
 	if mType == NetworkControlCommand {
-		return nil, 0, fmt.Errorf("Network Command Received")
+		parser, ok := networkCommandFactory[mID]
+		if ok == false {
+			return nil, 0, fmt.Errorf("Unknown network command 0x%02x", mID)
+		}
+		return parser(mClass, f.Data[0:f.Dlc])
 	}
 
 	if mType == HeartBeat {
@@ -160,7 +174,7 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 
 	creator, ok := messageFactory[mClass]
 	if ok == false {
-		return nil, mID, fmt.Errorf("Unknown message type 0x%05x", mClass)
+		return nil, mID, fmt.Errorf("Unknown message type 0x%02x", mClass)
 	}
 
 	m := creator()

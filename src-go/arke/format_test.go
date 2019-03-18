@@ -98,6 +98,50 @@ func (s *FormatSuite) TestFormatting(c *C) {
 			},
 			"arke.HeartBeat{Class: Celaeno, ID: 3, Version: 1.4.0.1}",
 		},
+		{
+			&HeartBeatRequestData{
+				Class:  0,
+				Period: 0,
+			},
+			"arke.HeartBeatRequest{Class: Broadcast, Node: All, Period: SinglePing}",
+		},
+		{
+			&HeartBeatRequestData{
+				Class:  ZeusClass,
+				Period: 100 * time.Millisecond,
+			},
+			"arke.HeartBeatRequest{Class: Zeus, Node: All, Period: 100ms}",
+		},
+		{
+			&ResetRequestData{
+				Class: 0,
+				ID:    0,
+			},
+			"arke.ResetRequest{Class: Broadcast, Node: All}",
+		},
+		{
+			&ResetRequestData{
+				Class: HeliosClass,
+				ID:    2,
+			},
+			"arke.ResetRequest{Class: Helios, Node: 2}",
+		},
+		{
+			&IDChangeRequestData{
+				Class: CelaenoClass,
+				Old:   1,
+				New:   2,
+			},
+			"arke.IDChangeRequest{Class: Celaeno, OldID: 1, NewID: 2}",
+		},
+		{
+			&ErrorReportData{
+				Class:     ZeusClass,
+				ID:        1,
+				ErrorCode: 0x42,
+			},
+			"arke.ErrorReport{Class: Zeus, ID: 1, ErrorCode: 0x0042}",
+		},
 	}
 
 	c.Assert(len(testdata) >= len(messageFactory), Equals, true)
