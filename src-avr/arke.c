@@ -31,19 +31,51 @@ typedef enum ArkeHeartbeatStatus_e {
 	HEARTBEAT_REPEAT = 2
 } ArkeHeartbeatStatus_e;
 
+
+#define ARKE_ERROR_FIFO_SIZE 16
+#define ARKE_ERROR_FIFO_MASK 15
+
+struct ArkeErrorFIFO_t {
+	ArkeError_t data[ARKE_ERROR_FIFO_SIZE];
+	uint8_t size,head,tail;
+};
+
+#define FIFO_INIT(f) do {	  \
+		(f).size = 0; \
+		(f).head = 0; \
+		(f).tail = 0; \
+	}while(0)
+#define FIFO_FULL(f) ((f).size >= ARKE_ERROR_FIFO_SIZE)
+#define FIFO_EMPTY(f) ((f).size == 0)
+#define FIFO_HEAD(f) ((f).data[(f).head])
+#define FIFO_TAIL(f) ((f).data[(f).tail])
+#define FIFO_INCR_PTR(p) (p) = ((p) + 1) & ARKE_ERROR_FIFO_MASK
+#define FIFO_INCREMENT_HEAD(f) do{	  \
+		FIFO_INCR_PTR((f).head); \
+		(f).size -= 1; \
+	}while(0)
+#define FIFO_INCREMENT_TAIL(f) do{	  \
+		FIFO_INCR_PTR((f).tail); \
+		(f).size += 1; \
+	}while(0)
+
+
+
 typedef struct ArkeData_t {
 	//we limit ourselfs to 6 MOb
 	yaacl_txn_t control;
-    yaacl_txn_t heartbeat;
+	yaacl_txn_t heartbeat,error;
 	yaacl_txn_t rx,broadcast;
 	uint8_t rxLength;
 	uint8_t * rxBuffer;
 	uint8_t controlData[8];
 	uint8_t heartbeatData[VERSION_LENGTH];
+	uint8_t errorData[4];
 	ArkeHeartbeatStatus_e heartbeatStatus;
 	ArkeSystime_t heartbeatPeriod;
 	ArkeSystime_t lastHeartbeat;
 	uint8_t ID;
+	struct ArkeErrorFIFO_t errors;
 } ArkeData_t;
 
 #define arke_prepare_rx_txn(ID_) do {	  \
@@ -96,6 +128,7 @@ void InitArke(uint8_t * rxBuffer, uint8_t length) {
 	yaacl_init(&config);
 
 	yaacl_init_txn(&(arke.control));
+	yaacl_init_txn(&(arke.error));
 	yaacl_init_txn(&(arke.heartbeat));
 	yaacl_init_txn(&(arke.rx));
 	//reserve immediatly the highest priority Mob for Network Control Handling
@@ -103,6 +136,15 @@ void InitArke(uint8_t * rxBuffer, uint8_t length) {
 	yaacl_make_std_mask(arke.control.mask,ARKE_MESSAGE_TYPE_MASK,1,1);
 	arke.control.length = 8;
 	arke.control.data = &(arke.controlData[0]);
+
+	arke.error.ID = arke.ID;
+	arke.error.length = 4;
+	arke.error.data = &(arke.errorData[0]);
+	arke.error.data[0] = ARKE_MY_CLASS;
+	arke.error.data[1] = arke.ID;
+	arke.error.data[2] = 0;
+	arke.error.data[3] = 0;
+
 
 	arke.heartbeat.ID = (ARKE_HEARTBEAT << 9 ) | (ARKE_MY_CLASS << 3) | arke.ID;
 	arke.heartbeat.data = &(arke.heartbeatData[0]);
@@ -115,6 +157,8 @@ void InitArke(uint8_t * rxBuffer, uint8_t length) {
 	yaacl_listen(&arke.control);
 	yaacl_listen(&arke.broadcast);
 	yaacl_listen(&arke.rx);
+
+	FIFO_INIT(arke.errors);
 
 }
 
@@ -160,6 +204,10 @@ void ProcessControl() {
 		cli();
 		eeprom_update_byte(&arkeID,arke.ID);
 		SREG = sreg;
+
+
+		// needed, but normally you won't change ID on the fly.
+		ArkeSoftwareReset();
 		return;
 	}
 }
@@ -196,6 +244,23 @@ yaacl_idt_t ArkeProcessNodeMessage(uint8_t * length) {
 
 }
 
+void arkeSendErrors() {
+	if (FIFO_EMPTY(arke.errors) || yaacl_txn_status(&(arke.error)) != YAACL_TXN_UNSUBMITTED ) {
+		return;
+	}
+
+	ArkeError_t e = FIFO_HEAD(arke.errors);
+	arke.errorData[2] = e & 0x00ff;
+	arke.errorData[3] = (e & 0xff00) >> 8;
+
+	yaacl_error_e err = yaacl_send(&(arke.error));
+	if (err == YAACL_ERR_MOB_OVERFLOW) {
+		return;
+	}
+
+	FIFO_INCREMENT_HEAD(arke.errors);
+}
+
 yaacl_idt_t ArkeProcess(uint8_t * length) {
 	yaacl_txn_status_e s = yaacl_txn_status(&(arke.control));
 	if ( s == YAACL_TXN_COMPLETED ) {
@@ -213,6 +278,8 @@ yaacl_idt_t ArkeProcess(uint8_t * length) {
 	}
 
 	yaacl_idt_t toReturn = ArkeProcessNodeMessage(length);
+
+	arkeSendErrors();
 
 	// heartbeat
 	if ( arke.heartbeatStatus == NO_HEARTBEAT
@@ -266,3 +333,13 @@ implement_sender_function(HeliosSetPoint)
 implement_sender_function(CelaenoSetPoint)
 implement_sender_function(CelaenoStatus)
 implement_sender_function(CelaenoConfig)
+
+
+
+void ArkeReportError(ArkeError_t error) {
+	if ( FIFO_FULL(arke.errors) ) {
+		return;
+	}
+	FIFO_TAIL(arke.errors) = error;
+	FIFO_INCREMENT_TAIL(arke.errors);
+}

@@ -32,6 +32,10 @@ void ArkeSoftwareReset();
 	}
 
 
+typedef uint16_t ArkeError_t;
+
+void ArkeReportError(ArkeError_t error);
+
 #define ARKE_DECLARE_SENDER_FUNCTION(name) \
 	yaacl_error_e ArkeSend ## name(yaacl_txn_t * txn, bool emergency,const Arke ## name * data)
 
