@@ -137,7 +137,7 @@ void InitArke(uint8_t * rxBuffer, uint8_t length) {
 	arke.control.length = 8;
 	arke.control.data = &(arke.controlData[0]);
 
-	arke.error.ID = arke.ID;
+	arke.error.ID = ARKE_ERROR_REPORT;
 	arke.error.length = 4;
 	arke.error.data = &(arke.errorData[0]);
 	arke.error.data[0] = ARKE_MY_CLASS;
