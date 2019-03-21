@@ -337,7 +337,8 @@ software reset immediatly after. The target ID cannot be 0.
 ### 0b011 Node Internal Error Report
 
 These special messages are use by nodes to report important internal
-errors
+errors. There main use is for development debug and any production 
+applications should not rely on these kind of error reporting.
 
 * Payload:
   * Data Length: 4
