@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Communication protocol is built upon CAN Bus 2.0 A. According to
+The Communication protocol is based upon CAN Bus 2.0 A. According to
 the OSI model it could be described has the following
 
 ### Physical and Data Link Layer
@@ -17,9 +17,9 @@ Linux, and a set of nodes. The host listen and acknowledge any message
 on the CAN bus. Each node has an unique 9 bit identifier. Each
 physical node is configured to respond to a certain set of CAN
 identifier alone on the bus, i.e. for any message identifier, only one
-single node could emit and should listen that type of message.
+single node should listen that type of message.
 
-The CAN base identifier 11 bit are subdicided as follow to specify any
+The CAN base identifier 11 bit are subdivided as follow to specify any
 message on the bus:
 
 <table>
@@ -27,7 +27,7 @@ message on the bus:
 		<th></th>
 		<th colspan="2">Message Class</th>
 		<th colspan="6">Message Category</th>
-		<th colspan="3">subID</th>
+		<th colspan="3">ID</th>
 	</tr>
 	<tr>
 		<th>Bit</th>
@@ -46,6 +46,8 @@ message on the bus:
 </table>
 
 
+### Message Category
+
 The first two bits are used to specify the class of the
 message according to the following table :
 
@@ -56,57 +58,73 @@ message according to the following table :
 |              0b10 | Standard Priority Messages              | Emission and Reception |
 |              0b11 | Heartbeat message                       |          Emission Only |
 
-Except for control messages the following 9 bit are subdivided in two
-subset, a 6 bit message category (MSB) and a 3 bit subID (LSB). As
-mentionned before only one single node over the bus should be able to
-handle an unique IDT, therefore two physically identicate board should
-be used on the bus, they could use the subID field to specify their
-specific message. The special subID 0b000 is used for broadcasting,
-and therefore up to 7 identical device can work on the bus at the same
-time.
 
-Any node on the bus can manage several message category, as it will be
-describe furtherly. The unique 9-bit identifier of a node consist of
-its lowest Message Category he handles and its subID.
+At the exception of Network Control Command and Heartbeat messages,
+the 9 remaning bits are used to specify a single node on the bus,
+using message class and ID field
 
-Network control Message are a bit more perticular. They are always
-broadcasted the message category is used to specify all or a specifc
-type, and the subID is used to convey the actual command.
+### Message Class
 
+The message class identify the kind of message and payload accordingly
+to this specifications. A physical device on the bus can receive
+several different class of message.
 
+The message class is encoded MSB first in bits 8...3 of the CAN IDT.
+
+Each device on the bus has an assigned class which correspond to the
+lowest message class value this node accepts.
+
+### ID field
+
+The ID field is here to ensure that several physically identical node
+could co-exist on the bus, and that we could address all of them
+independantly. It consist of the lowest 3 bits of the CAN IDT. The
+value of 0 is reserved for broadcasting.
+
+Each device of a given class must have a unique ID. When emmitting
+message, any device should use its own ID in the IDT. If the
+application needs two device to communicate indepandtly of the host,
+they have to share the same ID (but obviously different class).
+
+Only host can use the 0 value for broadcasting a message.
 
 
 ### Session Layer
 
 The session could be managed using heartbeat message. The host can use
-a Heartbeat request message to ask for all or for a specific node to
+a Heartbeat request message to ask for all nodes of given class to
 provide a heartbeat every X milliseconds. This heartbeat could be used
-to monitor which node are available. The same command could be used to
+to monitor which nodes are online. The same command could be used to
 specify a single heartbeat to enumerate all present node on the bus.
-
-
 
 ## FORT Standard Message Category Table and Node Class ID
 
 This table gives all message categories that could be found on the bus.
 
-| Message Category | Name                                          | Node         | Node Class ID (without subID) |
-|-----------------:|:----------------------------------------------|:-------------|:------------------------------|
-|        0x39-0x3f | Reserved (Zeus)                               | Zeus         | 0x38                          |
-|             0x39 | Zeus Temperature and Humidity Report          | Zeus         | 0x38                          |
-|             0x38 | Zeus Temperature and Humidity Set Poiny       | Zeus         | 0x38                          |
-|        0x35-0x37 | Reserved (Helios)                             | Helios       | 0x34                          |
-|             0x34 | Helios Illumination Set Point                 | Helios       | 0x34                          |
-|        0x32-0x33 | Reserved (Celaeno)                            | Celaeno      | 0x30                          |
-|             0x31 | Celaeno Set Point                             | Celaeno      | 0x30                          |
-|             0x30 | Celaeno Status                                | Celaeno      | 0x30                          |
-|        0x04-0x29 | For future use                                | n.a          | n.a                           |
-|             0x00 | Reserved for broadcast                        | all          | n.a.                          |
+| Message Category | Name                                    | Node    | Node Class ID (without subID) |
+|-----------------:|:----------------------------------------|:--------|:------------------------------|
+|             0x3f | Reserved (Zeus)                         | Zeus    | 0x38                          |
+|             0x3e | Zeus Delta Temperature Configuration    | Zeus    | 0x38                          |
+|             0x3d | Zeus Control Point Report               | Zeus    | 0x38                          |
+|             0x3c | Zeus Status Report                      | Zeus    | 0x38                          |
+|             0x3b | Zeus Configuration                      | Zeus    | 0x38                          |
+|             0x3a | Zeus Vibration Report                   | Zeus    | 0x38                          |
+|             0x39 | Zeus Temperature and Humidity Report    | Zeus    | 0x38                          |
+|             0x38 | Zeus Temperature and Humidity Set Point | Zeus    | 0x38                          |
+|        0x36-0x37 | Reserved (Helios)                       | Helios  | 0x34                          |
+|             0x35 | Helios Pulse Mode                       | Helios  | 0x34                          |
+|             0x34 | Helios Set Point                        | Helios  | 0x34                          |
+|             0x33 | Reserved (Celaeno)                      | Celaeno | 0x30                          |
+|             0x31 | Celaeno Configuration                   | Celaeno | 0x30                          |
+|             0x31 | Celaeno Status                          | Celaeno | 0x30                          |
+|             0x30 | Celaeno Set Point                       | Celaeno | 0x30                          |
+|        0x01-0x29 | Reserved for Future Use                 | n.a     | n.a                           |
+|             0x00 | Reserved for broadcast                  | all     | n.a.                          |
+
 Any of this messages can be sent using low (0b10) and high (0b01)
 priority.
 
-This gives the following class ID for the FORT nodes currently
-available :
+This gives the following class ID for the FORT node currently defined :
 
 | Node Name | Device Class ID |
 |----------:|:----------------|
@@ -114,132 +132,241 @@ available :
 |    Helios | 0x34            |
 |   Celaeno | 0x30            |
 
-For all messages, the host can use a RTR request on the device to
-actively fetch the data if he requires it and this data is not sent
-periodically.
+For all of this messages, the host can use a RTR request (with a DLC
+of strictly zero) to actively fetch the data if required.
 
 ## Message Specifications.
 
-#### 0x39 Zeus Temperature and Humidity Report
 
-* Access :  Read Only
-* Periodically emitted by node : yes (frequency not yet determined)
-* Write : n.a.
-* Read :
-  * Data Length: to be determined.
-  * Data Fields: to be determined.
+#### 0x30 Celaeno Humidity Set Point
 
-
-#### 0x38 Zeus Temperature and Humidity Set Point
-
-* Access :  Read/Write
+* Host Access :  Read/Write
 * Periodically emitted by node : never
-* Read/Write :
-  * Data Length: to be determined.
-  * Data fields: to be determined.
-
-
-#### 0x34 Helios Illumination Set Point
-
-* Access :  Read/Write
-* Periodically emitted by node : never
-* Read/Write :
-  * Data Length: 2
-  * Data fields:
-	* Byte 0: Visible Light Amount level from none to max (255).
-	* Byte 1: UV Light Level
-
-Note, unstar the previous system, the infrared light pulse duration is
-solely managed by the framegrabber.
-
-
-#### 0x31 Celaeno Humidity Production Set Point
-
-* Access :  Read/Write
-* Periodically emitted by node : never
-* Read/Write :
+* Payload :
   * Data Length: 1
   * Data fields:
-	* Byte 0: Amount of humidity currently produced.
+	* Byte 0: Amount of humidity to be produced.
 
+#### 0x31 Celaeno Status
 
-#### 0x30 Celaeno Status
-
-* Access :  Read
-* Periodically emitted by node : yes on exceptional situation
-  (warning / critical level reached).
-* Write: n.a.
-* Read :
+* Host Access :  Read
+* Periodically emitted by node : yes on any exceptional situation.
+* Payload :
   * Data Length: 3
   * Data fields:
 	* Byte 0: Water Level Status
 	  * 0x00: Functionning Normally
 	  * 0x01: Warning Level Reached
 	  * 0x02: Critical Level Reached, Humidity Production Disabled.
-	  * 0x04: Incoherent sensor readout.
-  * Byte 1-2: Fan Status
+	  * 0x04: Sensor readout error.
+	* Bytes 1-2: Fan Status, Little Endian
       * B0 - B13 : Fan Current RPM
 	  * B14 : If set, specifies a fan aging alert
-	  * B15 : If set, specifies a fan stall alert (Fan should spin but is not)
+	  * B15 : If set, specifies a fan stall alert (Fan should spin but it is currently)
+
+#### 0x32 Celaeno Configuration
+
+* Host Access :  Read/Write
+* Periodically emitted by node : never
+* Payload :
+  * Data Length: 8
+  * Data fields:
+	* Bytes 0-1: Ramp Up time, in ms, Little Endian
+	* Bytes 2-3: Ramp Down time, in ms, Little Endian
+	* Bytes 4-5: Minimum On time, in ms, Little Endian
+	* Bytes 6-7: Floating Sensor Debounce Time, in ms, Little Endian
+
+#### 0x34 Helios Set Point
+
+* Host Access :  Read/Write
+* Periodically emitted by node : never
+* Payload :
+  * Data Length: 2
+  * Data fields:
+	* Byte 0: Visible Light Amount
+	* Byte 1: UV Light Amount
+
+#### 0x35 Helios Pulse Mode Toggle
+
+Toggles a pulse mode where light output is a triangle wave with a few
+seconds period. Mainly here for debug purpose.
+
+* Host Access :  Write
+* Periodically emitted by node : never
+* Payload :
+  * Data Length: 0
+
+
+#### 0x38 Zeus Set Point
+
+* Host Access :  Read/Write
+* Periodically emitted by node : never
+* Payload :
+  * Data Length: 4
+  * Data fields:
+    * Bytes 0-1: Target Relative Humidity, result of (relative_humidity/100.0) * 16382, Little Endian
+	* Bytes 2-3: Target Temperature, results of ( (temp+40.0) / 165.0 ) * 16382, Little Endian
+
+#### 0x39 Zeus Climate Report
+
+* Host Access :  Read
+* Periodically emitted by node : yes
+* Payload :
+  * Data Length: 8
+  * Data fields:
+    * Bits 0-13: Current Relative Humidity, Little Endian, conversion: x -> (x/16382)*100.0 in %
+	* Bits 14-27: Ant Temperature,  Little Endian, conversion: x -> (x/16382)*165 - 40.0 in °C
+    * Bits 28-39: Aux Temperature 1,  2-complement on 12 bits, Little Endian, conversion: x -> x * 0.0625 in °C
+	* Bits 40-51: Aux Temperature 2,  2-complement on 12 bits, Little Endian, conversion: x -> x * 0.0625 in °C
+	* Bits 52-63: Aux Temperature 3,  2-complement on 12 bits, Little Endian, conversion: x -> x * 0.0625 in °C
+
+#### 0x3a Zeus Vibration Report
+
+This message is reserved for future use
+
+* Host Access :  Read
+* Periodically emitted by node : yes
+* Payload : Undefined
+
+#### 0x3b Zeus Configuration
+
+* Host Access :  Read/Write
+* Periodically emitted by node : never
+* Payload :
+  * Data Length: 8
+  * Data fields:
+	* Bytes 0-3: Humidity PID Control Configuration
+	  * Bits 0-7: Proportional Gain
+	  * Bits 8-15: Derivative Gain
+	  * Bits 16-24: Integral Gain
+	  * Bits 25-28: Proportional and Derivative divider, in power of 2. if p is bits 0..7 and d is bits 25-28, final gain is p/(2^d)
+	  * Bits 29-31: Integral divider in power of 2
+    * Bytes 4-7: Temperature PID Control Configuration, same structure than above
+
+
+#### 0x3c Zeus Status
+
+* Host Access :  Read
+* Periodically emitted by node : on exceptional situation
+* Payload :
+  * Data Length: 7
+  * Data fields:
+	* Byte 0: Generas Zeus Status
+	  * Bit 0: Climate Control Loop is running (set point received)
+	  * Bit 1: Climate Uncontrolled for too long flag
+	  * Bit 2: Target Humidity cannot be reached flag
+	  * Bit 3: Target Temperature cannot be reached flag
+    * Bytes 1-2: Wind fan status and RPM, same structure than Celaeno Fan status
+    * Bytes 3-4: Right Extraction fan status and RPM, same structure than Celaeno Fan status
+    * Bytes 3-4: Left Extraction fan status and RPM, same structure than Celaeno Fan status
+
+
+#### 0x3d Zeus Control Point
+
+* Host Access :  Read
+* Periodically emitted by node : yes
+* Payload :
+  * Data Length: 4
+  * Data fields:
+	* Bytes 0-1: Humidity PID Control command output, signed word Little Endian
+	* Bytes 2-3: Temperature PID Control command output, signed word Little Endian
+
+
+#### 0x3e Zeus Delta Temperature
+
+* Host Access :  Read/Write
+* Periodically emitted by node : never
+* Payload :
+  * Data Length: 8
+  * Data fields:
+	* Bytes 0-1: Ant Temperature delta, signed word little endian, (x) -> x*16382/165 °C
+	* Bytes 2-3: Aux1 Temperature delta, signed word little endian, (x) -> x*0.0625 °C
+	* Bytes 4-5: Aux2 Temperature delta, signed word little endian, (x) -> x*0.0625 °C
+	* Bytes 6-7: Aux2 Temperature delta, signed word little endian, (x) -> x*0.0625 °C
 
 
 ## FORT Network Control Command Specification
 
-As mentionned previously, Network Control Command are specified differently:
+Network Control Command IDT are formatted differently than other messages:
 * The category field is used to target specific node class, or 0x00
   to broadcast to all classes
-* The subID field is used as a command specification, all node of
+* The ID fields is used as a command specification, all node of
   the same class are broadcasted.
 
 The following command are specified, note that for some their
 implementation is not necesarly required
 
-| Code  | Command                   | Implementation |
-|-------|---------------------------|----------------|
-| 0b000 | Software Reset Request    | Required       |
-| 0b001 | Timestamp Synchrnoization | Optional       |
-| 0b010 | Node ID Change            | Required       |
-| 0b111 | Heartbeat Request         | Required       |
+| Code  | Command                   | Implementation | Payload      |
+|-------|---------------------------|----------------|--------------|
+| 0b000 | Software Reset Request    | Required       | 1 byte       |
+| 0b001 | Timestamp Synchronization | Optional       | n.a.         |
+| 0b010 | Node ID Change            | Required       | 2 bytes      |
+| 0b011 | Device Error Report       | Required       | 4 bytes      |
+| 0b111 | Heartbeat Request         | Required       | 0 or 2 bytes |
 
-As these message are broadcasted, the RTR beat should always be set to
-zero.
 
+Network command cannot use the RTR flag
 
 ### 0b000 Software Reset Request
 
 Any node on the bus should implement this feature and reset itself
-after acknowledgement. The expected data length is 0 byte.
+after acknowledgement. The payload of this command is the target ID
+that need to perform the reset. A value of 0 resets all nodes of the
+choosen class(es)
 
+* Payload:
+  * Data Length: 1
+  * Data fields:
+	* Byte 0: Target Node ID
 
-### 0b001 Timestamp Synchronisation
+### 0b001 Timestamp Synchronization
 
-Not specified yet, be if timestamped data would be required on the
-bus, this high priority frame should be used for re-synchronizing
-node clocks to the Host one.
+Not specified yet.
+
+### 0b010 Node ID Change Request
+
+Request a node to change its ID to a new one. It will trigger a
+software reset immediatly after. The target ID cannot be 0.
+
+* Payload:
+  * Data Length: 2
+  * Data Fields:
+	* Byte 0: Target old ID, 0 does not broadcast
+	* Byte 1: Target new ID, should be in 1 to 7 range
+
+### 0b011 Node Internal Error Report
+
+These special messages are use by nodes to report important internal
+errors
+
+* Payload:
+  * Data Length: 4
+  * Data Fields:
+	* Byte 0: Class of the device issuing the error
+	* Byte 1: ID of the device issuing the error
+	* Bytes 2-3: Error Code, little endian word
 
 ### 0b111 Heartbeat Request
 
-This command is used to request for the targeted nodes to transmit
-an heartbeat. The Host specifies an Heartbeat period in ms, and the
+This command is used to request for the targeted nodes to transmit an
+heartbeat. The Host specifies an Heartbeat period in ms, and the
 targeted nodes are expected to transmit an heartbeat periodically
 after acknowledgment. If the period is 0 or simply omitted, a single
 heartbeat request should be sent by the targeted nodes.
 
-* Data Length: 0 or 2
-* Data Field:
-  * Byte 0: Heartbeat period LSB
-  * Byte 1: Heartbeat period MSB
+* Payload
+  * Data Length: 0 or 2
+  * Data Fields:
+	* Bytes 0-1: Heartbeat period, in ms, little endian
 
 ## Heartbeat Message Specification
 
-Heartbeat message are issued by nodes to monitor all the nodes
-status. The CAN IDT would consist of 0b11 followed by the node
-unique ID (Node Class + subID). In the case the heartbeat is emitted
-following a single heartbeat request (node enumeration), the
-heartbeat should contain a firmware version information. In case of
-heartbeat periodically sent, the nodes could avoid to transmit this
-information (but are allowed to transmit). Firmware version consist of
-2 to 4 number, corresponding to Major,Minor,Patch and Tweak numbering
+Heartbeat message are issued by nodes to monitor all the nodes live
+status. The CAN IDT would consist of 0b11 followed by the node unique
+ID (Node Class + ID). In the case the heartbeat is emitted following a
+single heartbeat request (node pinging/enumeration), the heartbeat
+should contain a firmware version information. In case of heartbeat
+periodically sent, the nodes should not transmit this information
 
 * Data Length 0, 2, 3 or 4.
 * Data Field :
