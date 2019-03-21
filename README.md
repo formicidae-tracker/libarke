@@ -1,4 +1,3 @@
-# FORT - Electronic Device Communication Protocol Implementation - libarke
+# libarke: CAN based Communication Protocol ofr the FORmicidae Tracker
 
-This repository holds specifications, device (AVR) and host (Linux)
-implementation of the FORmicidae Device Communication Protocol.
+This repository holds specifications, device (AVR) and host (Linux/Go) implementation of the communication protocol used by electronic devices of the FORmicidae Tracker Project.
