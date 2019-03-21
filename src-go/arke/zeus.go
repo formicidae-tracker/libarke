@@ -253,9 +253,16 @@ func (m *ZeusDeltaTemperature) Unmarshall(buf []byte) error {
 
 func init() {
 	messageFactory[ZeusSetPointMessage] = func() ReceivableMessage { return &ZeusSetPoint{} }
+	messagesName[ZeusSetPointMessage] = "Zeus.SetPoint"
 	messageFactory[ZeusReportMessage] = func() ReceivableMessage { return &ZeusReport{} }
+	messagesName[ZeusReportMessage] = "Zeus.Report"
 	messageFactory[ZeusConfigMessage] = func() ReceivableMessage { return &ZeusConfig{} }
+	messagesName[ZeusConfigMessage] = "Zeus.Config"
 	messageFactory[ZeusStatusMessage] = func() ReceivableMessage { return &ZeusStatus{} }
+	messagesName[ZeusStatusMessage] = "Zeus.Status"
 	messageFactory[ZeusControlPointMessage] = func() ReceivableMessage { return &ZeusControlPoint{} }
+	messagesName[ZeusControlPointMessage] = "Zeus.ControlPoint"
 	messageFactory[ZeusDeltaTemperatureMessage] = func() ReceivableMessage { return &ZeusDeltaTemperature{} }
+	messagesName[ZeusDeltaTemperatureMessage] = "Zeus.DeltaTemperature"
+	messagesName[ZeusVibrationReportMessage] = "Zeus.VibrationReport"
 }

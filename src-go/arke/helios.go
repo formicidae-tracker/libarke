@@ -35,4 +35,6 @@ func (c *HeliosSetPoint) String() string {
 
 func init() {
 	messageFactory[HeliosSetPointMessage] = func() ReceivableMessage { return &HeliosSetPoint{} }
+	messagesName[HeliosSetPointMessage] = "Helios.SetPoint"
+	messagesName[HeliosPulseModeMessage] = "Helios.PulseMode"
 }

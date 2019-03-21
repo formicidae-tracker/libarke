@@ -33,6 +33,7 @@ const (
 
 	BroadcastID NodeID = 0x00
 
+	RTRRequestMessage             MessageClass = MessageClass(1 << 10)
 	HeartBeatMessage              MessageClass = MessageClass(HeartBeat << 9)
 	ResetRequestMessage           MessageClass = MessageClass(0x7f8 | ResetRequest)
 	SynchronisationRequestMessage MessageClass = MessageClass(0x7f8 | SynchronisationRequest)
@@ -144,13 +145,64 @@ type networkCommandParser func(c MessageClass, buffer []byte) (ReceivableMessage
 
 var networkCommandFactory = make(map[NodeID]networkCommandParser)
 
+type MessageRequestData struct {
+	Class MessageClass
+	ID    NodeID
+}
+
+func (d *MessageRequestData) MessageClassID() MessageClass {
+	return RTRRequestMessage
+}
+
+var messagesName = make(map[MessageClass]string)
+
+func (c MessageClass) String() string {
+	if n, ok := messagesName[c]; ok == true {
+		return n
+	}
+	return "<unknown>"
+}
+
+func (d *MessageRequestData) String() string {
+	if d.ID == NodeID(0) {
+		return fmt.Sprintf("arke.MessageRequest{Message:%s, Node: all}", d.Class)
+	}
+	return fmt.Sprintf("arke.MessageRequest{Message:%s, Node: %d}", d.Class, d.ID)
+}
+
+func (d *MessageRequestData) Unmarshall(buf []byte) error {
+	return nil
+}
+
+func parseRTR(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
+	mType, mClass, mID := extractCANIDT(f.ID)
+
+	if f.Dlc > 0 {
+		return nil, 0, fmt.Errorf("RTR frame with a payload")
+	}
+	if mType != StandardMessage && mType != HighPriorityMessage {
+		return nil, 0, fmt.Errorf("Unauthorized network command RTR frame")
+	}
+
+	_, ok := messageFactory[mClass]
+	if ok == false {
+		return nil, mID, fmt.Errorf("Unknown message type 0x%02x", int(mClass))
+	}
+
+	return &MessageRequestData{
+		Class: mClass,
+		ID:    mID,
+	}, mID, nil
+
+}
+
 func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 	if f.Extended == true {
 		return nil, 0, fmt.Errorf("Arke does not support extended IDT")
 	}
 
 	if f.RTR == true {
-		return nil, 0, fmt.Errorf("RTR frame")
+		return parseRTR(f)
 	}
 
 	mType, mClass, mID := extractCANIDT(f.ID)
@@ -174,7 +226,7 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 
 	creator, ok := messageFactory[mClass]
 	if ok == false {
-		return nil, mID, fmt.Errorf("Unknown message type 0x%02x", mClass)
+		return nil, mID, fmt.Errorf("Unknown message type 0x%02x", int(mClass))
 	}
 
 	m := creator()

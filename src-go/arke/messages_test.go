@@ -142,6 +142,11 @@ func (s *MessageSuite) TestMessageParsing(c *C) {
 			4,
 			&CelaenoConfig{time.Second, time.Second, time.Second, time.Second},
 		},
+		{
+			socketcan.CanFrame{ID: makeCANIDT(StandardMessage, CelaenoConfigMessage, 5), Dlc: 0, Data: []byte{}, RTR: true},
+			5,
+			&MessageRequestData{Class: CelaenoConfigMessage, ID: 5},
+		},
 	}
 
 	for _, d := range testdata {
@@ -163,9 +168,14 @@ func (s *MessageSuite) TestMessageParsing(c *C) {
 			"Arke does not support extended IDT",
 		},
 		{
-			socketcan.CanFrame{RTR: true},
-			"RTR frame",
+			socketcan.CanFrame{RTR: true, Dlc: 1},
+			"RTR frame with a payload",
 		},
+		{
+			socketcan.CanFrame{RTR: true, Dlc: 0, ID: makeCANIDT(NetworkControlCommand, 0, 0)},
+			"Unauthorized network command RTR frame",
+		},
+
 		{
 			socketcan.CanFrame{ID: makeCANIDT(NetworkControlCommand, 0, 6)},
 			"Unknown network command 0x06",
@@ -179,6 +189,10 @@ func (s *MessageSuite) TestMessageParsing(c *C) {
 			"Unknown message type 0x00",
 		},
 		{
+			socketcan.CanFrame{ID: makeCANIDT(StandardMessage, 0, 1), Dlc: 0, Data: []byte{}, RTR: true},
+			"Unknown message type 0x00",
+		},
+		{
 			socketcan.CanFrame{ID: makeCANIDT(StandardMessage, ZeusReportMessage, 1), Dlc: 1, Data: []byte{0}},
 			"Could not parse message data: .*",
 		},
@@ -188,4 +202,33 @@ func (s *MessageSuite) TestMessageParsing(c *C) {
 		_, _, err := ParseMessage(&d.F)
 		c.Check(err, ErrorMatches, d.E)
 	}
+
+	// does nothing
+	c.Check((&MessageRequestData{}).Unmarshall(nil), Equals, nil)
+}
+
+func (s *MessageSuite) TestMessagesName(c *C) {
+	testdata := []struct {
+		C MessageClass
+		E string
+	}{
+		{ZeusSetPointMessage, "Zeus.SetPoint"},
+		{ZeusReportMessage, "Zeus.Report"},
+		{ZeusVibrationReportMessage, "Zeus.VibrationReport"},
+		{ZeusConfigMessage, "Zeus.Config"},
+		{ZeusStatusMessage, "Zeus.Status"},
+		{ZeusControlPointMessage, "Zeus.ControlPoint"},
+		{ZeusDeltaTemperatureMessage, "Zeus.DeltaTemperature"},
+		{HeliosSetPointMessage, "Helios.SetPoint"},
+		{HeliosPulseModeMessage, "Helios.PulseMode"},
+		{CelaenoSetPointMessage, "Celaeno.SetPoint"},
+		{CelaenoStatusMessage, "Celaeno.Status"},
+		{CelaenoConfigMessage, "Celaeno.Config"},
+		{0, "<unknown>"},
+	}
+
+	for _, d := range testdata {
+		c.Check(d.C.String(), Equals, d.E)
+	}
+
 }

@@ -145,6 +145,9 @@ func (c *CelaenoConfig) String() string {
 
 func init() {
 	messageFactory[CelaenoSetPointMessage] = func() ReceivableMessage { return &CelaenoSetPoint{} }
+	messagesName[CelaenoSetPointMessage] = "Celaeno.SetPoint"
 	messageFactory[CelaenoStatusMessage] = func() ReceivableMessage { return &CelaenoStatus{} }
+	messagesName[CelaenoStatusMessage] = "Celaeno.Status"
 	messageFactory[CelaenoConfigMessage] = func() ReceivableMessage { return &CelaenoConfig{} }
+	messagesName[CelaenoConfigMessage] = "Celaeno.Config"
 }

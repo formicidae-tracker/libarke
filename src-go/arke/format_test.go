@@ -142,6 +142,20 @@ func (s *FormatSuite) TestFormatting(c *C) {
 			},
 			"arke.ErrorReport{Class: Zeus, ID: 1, ErrorCode: 0x0042}",
 		},
+		{
+			&MessageRequestData{
+				Class: ZeusSetPointMessage,
+				ID:    2,
+			},
+			"arke.MessageRequest{Message:Zeus.SetPoint, Node: 2}",
+		},
+		{
+			&MessageRequestData{
+				Class: ZeusControlPointMessage,
+				ID:    0,
+			},
+			"arke.MessageRequest{Message:Zeus.ControlPoint, Node: all}",
+		},
 	}
 
 	c.Assert(len(testdata) >= len(messageFactory), Equals, true)
