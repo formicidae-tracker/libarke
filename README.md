@@ -1,17 +1,17 @@
-# libarke: CAN based Communication Protocol ofr the FORmicidae Tracker
+# libarke: CAN based Communication Protocol for the FORmicidae Tracker
 
 This repository holds specifications, device (AVR) and host (Linux/Go) implementation of the communication protocol used by electronic devices of the FORmicidae Tracker Project.
 
 
 ## Specifications
 
-Complete specifications could be found in [specs/specs.md](https://github.com/formicidae-tracker/libarke/blob/master/specs/specs.md)
+Complete specifications can be found in [specs/specs.md](https://github.com/formicidae-tracker/libarke/blob/master/specs/specs.md)
 
 ## Implementation
 
-Currently two implementation of the protocol are available:
-* An AVR C implementation. It currently only supports AT90CANXXX processors.
-* A Golang implementation based on socketcan. It only supports the linux platform
+Two implementations of the protocol are currently available:
+* AVR C implementation, currently only supporting AT90CANXXX processors.
+* Golang implementation based on socketcan, only supporting the linux platform.
 
 ## Installation
 
