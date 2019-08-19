@@ -100,7 +100,7 @@ This table lists all possible message categories of the bus:
 |             0x33 | Reserved (Celaeno)                      | Celaeno | 0x30                          |
 |             0x31 | Celaeno Configuration                   | Celaeno | 0x30                          |
 |             0x31 | Celaeno Status                          | Celaeno | 0x30                          |
-|             0x30 | Celaeno Set Point                       | Celaeno | 0x30                          |
+|             0x30 | Celaeno Humidity Set Point              | Celaeno | 0x30                          |
 |        0x01-0x29 | Reserved for Future Use                 | n.a     | n.a                           |
 |             0x00 | Reserved for broadcast                  | all     | n.a.                          |
 
@@ -122,143 +122,139 @@ For all of these messages, the host can use a Remote Transmission Request (RTR) 
 
 #### 0x30 Celaeno Humidity Set Point
 
-* Host Access :  Read/Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access: Read/Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 1
   * Data fields:
-	* Byte 0: Amount of humidity to be produced.
+	* Byte 0: Amount of humidity to be produced
 
 #### 0x31 Celaeno Status
 
-* Host Access :  Read
-* Periodically emitted by node : yes on any exceptional situation.
-* Payload :
+* Host Access: Read
+* Periodically emitted by node: yes on any exceptional situation
+* Payload:
   * Data Length: 3
   * Data fields:
-	* Byte 0: Water Level Status
-	  * 0x00: Functionning Normally
-	  * 0x01: Warning Level Reached
-	  * 0x02: Critical Level Reached, Humidity Production Disabled.
-	  * 0x04: Sensor readout error.
-	* Bytes 1-2: Fan Status, Little Endian
-      * B0 - B13 : Fan Current RPM
+	* Byte 0: Water level status
+	  * 0x00: Functionning normally
+	  * 0x01: Warning level reached
+	  * 0x02: Critical level reached, humidity production disabled
+	  * 0x04: Sensor readout error
+	* Bytes 1-2: Fan Status, little endian
+	  * B0 - B13 : Current fan RPM
 	  * B14 : If set, specifies a fan aging alert
-	  * B15 : If set, specifies a fan stall alert (Fan should spin but it is currently)
+	  * B15 : If set, specifies a fan stall alert (Fan should spin but is currently not)
 
 #### 0x32 Celaeno Configuration
 
-* Host Access :  Read/Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access: Read/Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 8
   * Data fields:
-	* Bytes 0-1: Ramp Up time, in ms, Little Endian
-	* Bytes 2-3: Ramp Down time, in ms, Little Endian
-	* Bytes 4-5: Minimum On time, in ms, Little Endian
-	* Bytes 6-7: Floating Sensor Debounce Time, in ms, Little Endian
+	* Bytes 0-1: Ramp-up time [ms], little endian
+	* Bytes 2-3: Ramp-down time [ms], little endian
+	* Bytes 4-5: Minimum On time [ms], little endian
+	* Bytes 6-7: Floating sensor debounce time [ms], little endian
 
 #### 0x34 Helios Set Point
 
-* Host Access :  Read/Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access: Read/Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 2
   * Data fields:
-	* Byte 0: Visible Light Amount
-	* Byte 1: UV Light Amount
+	* Byte 0: Visible light [TODO: amount?]
+	* Byte 1: UV light [TODO: amount?]
 
 #### 0x35 Helios Pulse Mode Toggle
 
-Toggles a pulse mode where light output is a triangle wave with a few
-seconds period. Mainly here for debug purpose.
+Toggles a pulse mode where light output is a triangle wave with a few seconds period. Mainly for debug purpose.
 
-* Host Access :  Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access:  Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 0
-
 
 #### 0x38 Zeus Set Point
 
-* Host Access :  Read/Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access:  Read/Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 4
   * Data fields:
-    * Bytes 0-1: Target Relative Humidity, result of (relative_humidity/100.0) * 16382, Little Endian
-	* Bytes 2-3: Target Temperature, results of ( (temp+40.0) / 165.0 ) * 16382, Little Endian
+  	* Bytes 0-1: Target relative humidity, result of (relative_humidity/100.0) * 16382, little endian
+	* Bytes 2-3: Target temperature, results of ( (temp+40.0) / 165.0 ) * 16382, little endian
 
 #### 0x39 Zeus Climate Report
 
-* Host Access :  Read
-* Periodically emitted by node : yes
-* Payload :
+* Host Access:  Read
+* Periodically emitted by node: yes
+* Payload:
   * Data Length: 8
   * Data fields:
-    * Bits 0-13: Current Relative Humidity, Little Endian, conversion: x -> (x/16382)*100.0 in %
-	* Bits 14-27: Ant Temperature,  Little Endian, conversion: x -> (x/16382)*165 - 40.0 in °C
-    * Bits 28-39: Aux Temperature 1,  2-complement on 12 bits, Little Endian, conversion: x -> x * 0.0625 in °C
-	* Bits 40-51: Aux Temperature 2,  2-complement on 12 bits, Little Endian, conversion: x -> x * 0.0625 in °C
-	* Bits 52-63: Aux Temperature 3,  2-complement on 12 bits, Little Endian, conversion: x -> x * 0.0625 in °C
+    	* Bits 0-13: Current relative humidity, little endian, conversion: x -> (x/16382)*100.0 in %
+	* Bits 14-27: Ant temperature,  little endian, conversion: x -> (x/16382)*165 - 40.0 in °C
+    	* Bits 28-39: Aux temperature 1,  2-complement on 12 bits, little endian, conversion: x -> x * 0.0625 in °C
+	* Bits 40-51: Aux temperature 2,  2-complement on 12 bits, little endian, conversion: x -> x * 0.0625 in °C
+	* Bits 52-63: Aux temperature 3,  2-complement on 12 bits, little endian, conversion: x -> x * 0.0625 in °C
 
 #### 0x3a Zeus Vibration Report
 
 This message is reserved for future use
 
-* Host Access :  Read
-* Periodically emitted by node : yes
-* Payload : Undefined
+* Host Access:  Read
+* Periodically emitted by node: yes
+* Payload: Undefined
 
 #### 0x3b Zeus Configuration
 
-* Host Access :  Read/Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access:  Read/Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 8
   * Data fields:
-	* Bytes 0-3: Humidity PID Control Configuration
-	  * Bits 0-7: Proportional Gain
-	  * Bits 8-15: Derivative Gain
-	  * Bits 16-24: Integral Gain
-	  * Bits 25-28: Proportional and Derivative divider, in power of 2. if p is bits 0..7 and d is bits 25-28, final gain is p/(2^d)
+	* Bytes 0-3: Humidity PID Control configuration
+	  * Bits 0-7: Proportional gain (P)
+	  * Bits 8-15: Derivative gain (D)
+	  * Bits 16-24: Integral gain (I)
+	  * Bits 25-28: Proportional and Derivative divider (DIV), in power of 2. if P is bits 0..7 and DIV is bits 25-28, the final proportional gain is P/(2^DIV)
 	  * Bits 29-31: Integral divider in power of 2
-    * Bytes 4-7: Temperature PID Control Configuration, same structure than above
-
+	  * Bytes 4-7: Temperature PID Control Configuration, same structure as above
 
 #### 0x3c Zeus Status
 
-* Host Access :  Read
-* Periodically emitted by node : on exceptional situation
-* Payload :
+* Host Access:  Read
+* Periodically emitted by node: on exceptional situation
+* Payload:
   * Data Length: 7
   * Data fields:
 	* Byte 0: Generas Zeus Status
-	  * Bit 0: Climate Control Loop is running (set point received)
-	  * Bit 1: Climate Uncontrolled for too long flag
-	  * Bit 2: Target Humidity cannot be reached flag
-	  * Bit 3: Target Temperature cannot be reached flag
-    * Bytes 1-2: Wind fan status and RPM, same structure than Celaeno Fan status
-    * Bytes 3-4: Right Extraction fan status and RPM, same structure than Celaeno Fan status
-    * Bytes 3-4: Left Extraction fan status and RPM, same structure than Celaeno Fan status
-
+	  * Bit 0: Climate control loop is running (set point received)
+	  * Bit 1: Climate uncontrolled for too long flag
+	  * Bit 2: Target humidity cannot be reached flag
+	  * Bit 3: Target temperature cannot be reached flag
+  	* Bytes 1-2: Wind fan status and RPM, same structure as Celaeno Fan status
+    	* Bytes 3-4: Right extraction fan status and RPM, same structure as Celaeno Fan status
+    	* Bytes 3-4: Left extraction fan status and RPM, same structure as Celaeno Fan status
 
 #### 0x3d Zeus Control Point
 
-* Host Access :  Read
-* Periodically emitted by node : yes
-* Payload :
+* Host Access:  Read
+* Periodically emitted by node: yes
+* Payload:
   * Data Length: 4
   * Data fields:
-	* Bytes 0-1: Humidity PID Control command output, signed word Little Endian
-	* Bytes 2-3: Temperature PID Control command output, signed word Little Endian
+	* Bytes 0-1: Humidity PID Control command output, signed word little endian
+	* Bytes 2-3: Temperature PID Control command output, signed word little endian
 
 
 #### 0x3e Zeus Delta Temperature
 
-* Host Access :  Read/Write
-* Periodically emitted by node : never
-* Payload :
+* Host Access:  Read/Write
+* Periodically emitted by node: never
+* Payload:
   * Data Length: 8
   * Data fields:
 	* Bytes 0-1: Ant Temperature delta, signed word little endian, (x) -> x*16382/165 °C
@@ -269,14 +265,13 @@ This message is reserved for future use
 
 ## FORT Network Control Command Specification
 
-Network Control Command IDT are formatted differently than other messages:
-* The category field is used to target specific node class, or 0x00
-  to broadcast to all classes
-* The ID fields is used as a command specification, all node of
-  the same class are broadcasted.
+Network Control Command IDTs are formatted differently than other messages:
+* The message category field is used to target specific node classes, or 0x00
+  t for broadcasts
+* The ID fields is used as command specification, that's to be broadcast to all nodes of the class specified.
 
-The following command are specified, note that for some their
-implementation is not necesarly required
+The following table lists the commands that are specified.
+Note that for some, the implementation is not stricly required.
 
 | Code  | Command                   | Implementation | Payload      |
 |-------|---------------------------|----------------|--------------|
@@ -287,73 +282,66 @@ implementation is not necesarly required
 | 0b111 | Heartbeat Request         | Required       | 0 or 2 bytes |
 
 
-Network command cannot use the RTR flag
+Network commands cannot use the RTR flag.
 
 ### 0b000 Software Reset Request
 
-Any node on the bus should implement this feature and reset itself
-after acknowledgement. The payload of this command is the target ID
-that need to perform the reset. A value of 0 resets all nodes of the
-choosen class(es)
+Any node on the bus must implement this feature in order to reset itself after acknowledging the command.
+The payload of this command is the target ID of the node that needs to perform a reset. A value of 0 resets all nodes of the
+specified class(es).
 
 * Payload:
   * Data Length: 1
   * Data fields:
-	* Byte 0: Target Node ID
+	* Byte 0: Target node ID
 
 ### 0b001 Timestamp Synchronization
 
-Not specified yet.
+Not yet specified.
 
 ### 0b010 Node ID Change Request
 
-Request a node to change its ID to a new one. It will trigger a
-software reset immediatly after. The target ID cannot be 0.
+Request a node to change its ID to a new one. This triggers a subsequent
+software reset. The target ID cannot be 0.
 
 * Payload:
   * Data Length: 2
   * Data Fields:
-	* Byte 0: Target old ID, 0 does not broadcast
-	* Byte 1: Target new ID, should be in 1 to 7 range
+	* Byte 0: Old target ID, cannot be 0 (broadcasts not possible)
+	* Byte 1: New target ID, should be in 1 to 7 range
 
 ### 0b011 Node Internal Error Report
 
-These special messages are use by nodes to report important internal
-errors. There main use is for development debug and any production 
-applications should not rely on these kind of error reporting.
+These special messages are use by nodes to report important internal errors. Their main purpose is for development debugging. Any production applications should not rely on this kind of error reporting.
 
 * Payload:
   * Data Length: 4
   * Data Fields:
 	* Byte 0: Class of the device issuing the error
 	* Byte 1: ID of the device issuing the error
-	* Bytes 2-3: Error Code, little endian word
+	* Bytes 2-3: Error code, little endian word
 
 ### 0b111 Heartbeat Request
 
-This command is used to request for the targeted nodes to transmit an
-heartbeat. The Host specifies an Heartbeat period in ms, and the
-targeted nodes are expected to transmit an heartbeat periodically
-after acknowledgment. If the period is 0 or simply omitted, a single
-heartbeat request should be sent by the targeted nodes.
+This command is used to request for the targeted nodes to transmit a heartbeat.
+The Host specifies an Heartbeat period in ms, and the targeted nodes are expected to transmit a heartbeat periodically after the acknowledgment. If the period is 0 or simply omitted, a single heartbeat requested from the targeted nodes.
 
-* Payload
+* Payload:
   * Data Length: 0 or 2
   * Data Fields:
-	* Bytes 0-1: Heartbeat period, in ms, little endian
+	* Bytes 0-1: Heartbeat period [ms], little endian
 
 ## Heartbeat Message Specification
 
-Heartbeat message are issued by nodes to monitor all the nodes live
-status. The CAN IDT would consist of 0b11 followed by the node unique
-ID (Node Class + ID). In the case the heartbeat is emitted following a
-single heartbeat request (node pinging/enumeration), the heartbeat
-should contain a firmware version information. In case of heartbeat
-periodically sent, the nodes should not transmit this information
+Heartbeat messages are issued by nodes to monitor their online status.
+The CAN IDT consists of 0b11 followed by the node's unique ID (Node Class + ID).
+In case the heartbeat is emitted following a single heartbeat request (node pinging/enumeration), the heartbeat must contain the firmware version information.
+In case of periodically sent heartbeats, the nodes must not transmit this information.
 
-* Data Length 0, 2, 3 or 4.
-* Data Field :
-  * Byte 0 : Major Version number (required if any versionning is transmitted)
-  * Byte 1 : Minor Version number (required if any versionning is transmitted)
-  * Byte 2 : Patch Version number (optional)
-  * Byte 3 : Tweak Version number (optional)
+* Payload:
+  * Data Length 0, 2, 3 or 4.
+  * Data Field :
+  	* Byte 0 : Major Version number (required if any versionning is transmitted)
+  	* Byte 1 : Minor Version number (required if any versionning is transmitted)
+  	* Byte 2 : Patch Version number (optional)
+  	* Byte 3 : Tweak Version number (optional)
