@@ -2,8 +2,8 @@
 
 ## Overview
 
-The Communication protocol is based upon CAN Bus 2.0 A. According to
-the OSI model it could be described has the following
+The Communication protocol is based on CAN Bus 2.0 A. According to
+the OSI model it can be described according to the folowing layers:
 
 ### Physical and Data Link Layer
 
@@ -12,14 +12,10 @@ specification running at 250 kbit/s.
 
 ### Network Layer
 
-The network consits of an host, usually a desktop computer running
-Linux, and a set of nodes. The host listen and acknowledge any message
-on the CAN bus. Each node has an unique 9 bit identifier. Each
-physical node is configured to respond to a certain set of CAN
-identifier alone on the bus, i.e. for any message identifier, only one
-single node should listen that type of message.
+The network consits of a host, usually a desktop computer, running Linux and a set of nodes (here: AVR microcontrollers).
+The host acknowledges any message on the CAN bus. Each node has an unique 9 bit identifier. Each physical node is configured to respond to a certain set of CAN identifier (IDT) alone on the bus, i.e. for any message identifier, only one single node should listen that type of message.
 
-The CAN base identifier 11 bit are subdivided as follow to specify any
+The 11 bits of the CAN base identifier are subdivided as follows to specify any
 message on the bus:
 
 <table>
@@ -46,60 +42,47 @@ message on the bus:
 </table>
 
 
-### Message Category
+#### Message Class
 
-The first two bits are used to specify the class of the
-message according to the following table :
+The first two bits are used to specify the class of the message according to the following table :
 
 |        Bits Value | Message Class                           | Node Permission        |
 |------------------:|:----------------------------------------|:-----------------------|
-|              0b00 | Network Control Command                 |           Receive Only |
+|              0b00 | Network Control Command                 |         Reception Only |
 |              0b01 | High Priority Message (error, emergency)|          Emission Only |
 |              0b10 | Standard Priority Messages              | Emission and Reception |
 |              0b11 | Heartbeat message                       |          Emission Only |
 
 
-At the exception of Network Control Command and Heartbeat messages,
-the 9 remaning bits are used to specify a single node on the bus,
-using message class and ID field
+Except for Network Control Command and Heartbeat messages, the 9 remaning bits are used to specify a single node on the bus using message class and ID field
 
-### Message Class
 
-The message class identify the kind of message and payload accordingly
-to this specifications. A physical device on the bus can receive
-several different class of message.
+#### Message Category
 
-The message class is encoded MSB first in bits 8...3 of the CAN IDT.
+The message class identifies the kind of message and payload according to this specifications. A physical device on the bus can receive several different classes of messages.
 
-Each device on the bus has an assigned class which correspond to the
-lowest message class value this node accepts.
+The message class is encoded MSB first in bits number 8...3 of the CAN IDT.
 
-### ID field
+Each device on the bus has an assigned a class which corresponds to the lowest message class value that this node accepts.
 
-The ID field is here to ensure that several physically identical node
-could co-exist on the bus, and that we could address all of them
-independantly. It consist of the lowest 3 bits of the CAN IDT. The
-value of 0 is reserved for broadcasting.
 
-Each device of a given class must have a unique ID. When emmitting
-message, any device should use its own ID in the IDT. If the
-application needs two device to communicate indepandtly of the host,
-they have to share the same ID (but obviously different class).
+#### ID field
 
-Only host can use the 0 value for broadcasting a message.
+The ID field ensures that several physically identical nodes can co-exist on the bus and be addressed independently. This field consists of the lowest 3 bits of the CAN IDT. The value 0 is reserved for broadcasting.
+
+Each device of a given class must have a unique ID. When emmitting message, any device uses its own ID in the IDT. If two devices are required by the application to communicate independently of the host, they need to share the same ID (but obviously different classes). TODO: The last sentence does not make sense, must be: If two devices are required by the application to communicate independently of the host, they need to share the same ID (but obviously different categories).
+
+Only the host can use the ID-value 0 to broadcast a message.
 
 
 ### Session Layer
 
-The session could be managed using heartbeat message. The host can use
-a Heartbeat request message to ask for all nodes of given class to
-provide a heartbeat every X milliseconds. This heartbeat could be used
-to monitor which nodes are online. The same command could be used to
-specify a single heartbeat to enumerate all present node on the bus.
+The session is managed using heartbeat messages. The host uses a Heartbeat request message to ask all nodes of given class to provide a heartbeat every X milliseconds. This heartbeat is used to monitor which nodes are online. The same command is used to
+request a single heartbeat to detect all nodes present on the bus.
 
 ## FORT Standard Message Category Table and Node Class ID
 
-This table gives all message categories that could be found on the bus.
+This table lists all possible message categories of the bus:
 
 | Message Category | Name                                    | Node    | Node Class ID (without subID) |
 |-----------------:|:----------------------------------------|:--------|:------------------------------|
@@ -121,10 +104,9 @@ This table gives all message categories that could be found on the bus.
 |        0x01-0x29 | Reserved for Future Use                 | n.a     | n.a                           |
 |             0x00 | Reserved for broadcast                  | all     | n.a.                          |
 
-Any of this messages can be sent using low (0b10) and high (0b01)
-priority.
+Any of these messages can be sent using low (0b10) or high (0b01) priority.
 
-This gives the following class ID for the FORT node currently defined :
+The following table lists the class IDs for the FORT nodes currently defined:
 
 | Node Name | Device Class ID |
 |----------:|:----------------|
@@ -132,8 +114,8 @@ This gives the following class ID for the FORT node currently defined :
 |    Helios | 0x34            |
 |   Celaeno | 0x30            |
 
-For all of this messages, the host can use a RTR request (with a DLC
-of strictly zero) to actively fetch the data if required.
+For all of these messages, the host can use a Remote Transmission Request (RTR) (with a Data length code (DLC) field of strictly zero) to actively fetch the data if required.
+
 
 ## Message Specifications.
 
