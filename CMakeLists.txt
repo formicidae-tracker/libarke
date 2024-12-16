@@ -1,4 +1,5 @@
 cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0076 NEW)
 
 project(
 	libarke
