@@ -94,14 +94,17 @@ This table lists all possible message categories of the bus:
 |             0x3a | Zeus Vibration Report                   | Zeus    | 0x38                          |
 |             0x39 | Zeus Temperature and Humidity Report    | Zeus    | 0x38                          |
 |             0x38 | Zeus Temperature and Humidity Set Point | Zeus    | 0x38                          |
-|        0x36-0x37 | Reserved (Helios)                       | Helios  | 0x34                          |
+|             0x37 | Reserved (Helios)                       | Helios  | 0x34                          |
+|             0x36 | Helios Trigger Mode                     | Helios  | 0x34                          |
 |             0x35 | Helios Pulse Mode                       | Helios  | 0x34                          |
 |             0x34 | Helios Set Point                        | Helios  | 0x34                          |
 |             0x33 | Reserved (Celaeno)                      | Celaeno | 0x30                          |
 |             0x31 | Celaeno Configuration                   | Celaeno | 0x30                          |
 |             0x31 | Celaeno Status                          | Celaeno | 0x30                          |
 |             0x30 | Celaeno Humidity Set Point              | Celaeno | 0x30                          |
-|        0x01-0x29 | Reserved for Future Use                 | n.a     | n.a                           |
+|        0x2d-0x2f | Reserved (Notus)                        | Notus   | 0x2c                          |
+|             0x2c | Notus Set Point                         | Notus   | 0x2c                          |
+|        0x01-0x2b | Reserved for Future Use                 | n.a     | n.a                           |
 |             0x00 | Reserved for broadcast                  | all     | n.a.                          |
 
 Any of these messages can be sent using low (0b10) or high (0b01) priority.
@@ -113,6 +116,7 @@ The following table lists the class IDs for the FORT nodes currently defined:
 |      Zeus | 0x38            |
 |    Helios | 0x34            |
 |   Celaeno | 0x30            |
+|     Notus | 0x2c            |
 
 For all of these messages, the host can use a Remote Transmission Request (RTR) (with a Data length code (DLC) field of strictly zero) to actively fetch the data if required.
 
@@ -184,7 +188,7 @@ Toggles a pulse mode where light output is a triangle wave with a few seconds pe
 * Payload:
   * Data Length: 4
   * Data fields:
-  	* Bytes 0-1: Target relative humidity, result of (relative_humidity/100.0) * 16382, little endian
+	* Bytes 0-1: Target relative humidity, result of (relative_humidity/100.0) * 16382, little endian
 	* Bytes 2-3: Target temperature, results of ( (temp+40.0) / 165.0 ) * 16382, little endian
 
 #### 0x39 Zeus Climate Report
