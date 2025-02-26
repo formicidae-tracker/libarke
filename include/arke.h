@@ -1,6 +1,5 @@
 #pragma once
 #include "inttypes.h"
-#include <cstdint>
 
 #ifdef __cplusplus
 extern "C" {
@@ -164,9 +163,8 @@ struct ArkeCelaenoConfig_t {
 typedef struct ArkeCelaenoConfig_t ArkeCelaenoConfig;
 
 struct ArkeNotusConfig_t {
-	uint16_t RampUpTimeMS;
 	uint16_t RampDownTimeMS;
-	uint16_t MinOnTimeMS;
+	uint8_t  MinFan, MaxHeat;
 } __attribute__((packed));
 
 #ifdef __cplusplus
