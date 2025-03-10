@@ -127,7 +127,7 @@ struct ArkeHeliosSetPoint_t {
 } __attribute__((packed));
 typedef struct ArkeHeliosSetPoint_t ArkeHeliosSetPoint;
 
-struct ArkeTriggerMode_t {
+struct ArkeHeliosTriggerConfig_t {
 	uint16_t Period_hecto_us;
 	uint16_t Pulse_us;
 } __attribute__((packed));
