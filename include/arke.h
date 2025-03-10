@@ -43,6 +43,7 @@ typedef enum ArkeMessageClass_e {
 	ARKE_ZEUS_DELTA_TEMPERATURE = 0x3e,
 	ARKE_HELIOS_SET_POINT       = 0x34,
 	ARKE_HELIOS_PULSE_MODE      = 0x35,
+	ARKE_HELIOS_TRIIGER_MODE    = 0x36,
 	ARKE_CELAENO_SET_POINT      = 0x30,
 	ARKE_CELAENO_STATUS         = 0x31,
 	ARKE_CELAENO_CONFIG         = 0x32,
@@ -125,6 +126,11 @@ struct ArkeHeliosSetPoint_t {
 	uint8_t UV;
 } __attribute__((packed));
 typedef struct ArkeHeliosSetPoint_t ArkeHeliosSetPoint;
+
+struct ArkeTriggerMode_t {
+	uint16_t Period_hecto_us;
+	uint16_t Pulse_us;
+} __attribute__((packed));
 
 struct ArkeCelaenoSetPoint_t {
 	uint8_t Power;
