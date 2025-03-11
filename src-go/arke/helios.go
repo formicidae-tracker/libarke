@@ -11,21 +11,21 @@ type HeliosSetPoint struct {
 	UV      uint8
 }
 
-func (c HeliosSetPoint) Marshall(buf []byte) (int, error) {
+func (m HeliosSetPoint) Marshall(buf []byte) (int, error) {
 	if err := checkSize(buf, 2); err != nil {
 		return 0, err
 	}
-	buf[0] = c.Visible
-	buf[1] = c.UV
+	buf[0] = m.Visible
+	buf[1] = m.UV
 	return 2, nil
 }
 
-func (c *HeliosSetPoint) Unmarshall(buf []byte) error {
+func (m *HeliosSetPoint) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 2); err != nil {
 		return err
 	}
-	c.Visible = buf[0]
-	c.UV = buf[1]
+	m.Visible = buf[0]
+	m.UV = buf[1]
 	return nil
 }
 
@@ -33,8 +33,8 @@ func (m *HeliosSetPoint) MessageClassID() MessageClass {
 	return HeliosSetPointMessage
 }
 
-func (c *HeliosSetPoint) String() string {
-	return fmt.Sprintf("Helios.SetPoint{Visible: %d, UV: %d}", c.Visible, c.UV)
+func (m *HeliosSetPoint) String() string {
+	return fmt.Sprintf("Helios.SetPoint{Visible: %d, UV: %d}", m.Visible, m.UV)
 }
 
 type HeliosPulseMode struct {
@@ -61,8 +61,8 @@ func (m *HeliosPulseMode) MessageClassID() MessageClass {
 	return HeliosPulseModeMessage
 }
 
-func (c *HeliosPulseMode) String() string {
-	return fmt.Sprintf("Helios.PulseMode{Period: %s}", c.Period)
+func (m *HeliosPulseMode) String() string {
+	return fmt.Sprintf("Helios.PulseMode{Period: %s}", m.Period)
 }
 
 type HeliosTriggerMode struct {

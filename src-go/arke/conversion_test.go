@@ -83,6 +83,8 @@ func (s *ConversionSuite) TestTmp1075Temperature(c *C) {
 	}
 
 	for _, d := range testData {
-		c.Check(tmp1075BinaryToFloat(d.BinaryValue), Equals, d.FloatValue)
+		comment := Commentf("Testing %.4f <=> 0x%04X", d.FloatValue, d.BinaryValue)
+		c.Check(tmp1075BinaryToFloat(d.BinaryValue), Equals, d.FloatValue, comment)
+		c.Check(tmp1075FloatToBinaray(d.FloatValue), Equals, d.BinaryValue, comment)
 	}
 }

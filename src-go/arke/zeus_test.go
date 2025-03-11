@@ -34,47 +34,15 @@ func (c *almostEqualChecker) Check(params []interface{}, names []string) (result
 }
 
 func (s *ZeusSuite) TestSetPointIO(c *C) {
-	testData := []struct {
-		Message ZeusSetPoint
-		Buffer  []byte
-	}{
-		{
-			Message: ZeusSetPoint{
-				Humidity:    42,
-				Temperature: 25,
-				Wind:        127,
-			},
-			Buffer: []byte{
-				0xe0, 0x1a, 0x35, 0x19, 0x7f,
-			},
-		},
-	}
+	checkMessageEncoding(c, &ZeusSetPoint{
+		Humidity:    41.997314,
+		Temperature: 24.994812,
+		Wind:        127,
+	}, []byte{
+		0xe0, 0x1a, 0x35, 0x19, 0x7f,
+	})
 
-	for _, d := range testData {
-		res := make([]byte, 5)
-		written, err := d.Message.Marshall(res)
-		if c.Check(err, IsNil) == false {
-			continue
-		}
-		c.Check(written, Equals, 5)
-		c.Check(res, DeepEquals, d.Buffer)
-	}
-
-	for _, d := range testData {
-		res := ZeusSetPoint{}
-		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
-			continue
-		}
-		c.Check(res.Wind, Equals, d.Message.Wind)
-		c.Check(res.Humidity, AlmostChecker, d.Message.Humidity, 0.01)
-		c.Check(res.Temperature, AlmostChecker, d.Message.Temperature, 0.01)
-	}
-
-	m := ZeusSetPoint{}
-	written, err := m.Marshall([]byte{})
-	c.Check(err, ErrorMatches, "Invalid buffer size .*")
-	c.Check(written, Equals, 0)
-	c.Check(m.Unmarshall([]byte{}), ErrorMatches, "Invalid buffer size .*")
+	checkMessageLength(c, &ZeusSetPoint{}, 5)
 	errorData := []struct {
 		Buffer []byte
 		EMatch string
@@ -101,46 +69,23 @@ func (s *ZeusSuite) TestSetPointIO(c *C) {
 }
 
 func (s *ZeusSuite) TestReportIO(c *C) {
-	testData := []struct {
-		Message ZeusReport
-		Buffer  []byte
-	}{
-		{
-			Message: ZeusReport{
-				Humidity: 40,
-				Temperature: [4]float32{
-					25, 26, 27, 28,
-				},
-			},
-			Buffer: []byte{
-				0x99, 0x99,
-				0x4d, 0x06,
-				0x1a, 0xb0,
-				0x01, 0x1c,
-			},
+
+	checkMessageEncoding(c, &ZeusReport{
+		Humidity: 40.0012207,
+		Temperature: [4]float32{
+			25.0048828, 26, 27, 28,
 		},
-	}
-
-	for _, d := range testData {
-		res := ZeusReport{}
-		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
-			continue
-		}
-		c.Check(res.Humidity, AlmostChecker, d.Message.Humidity, 0.01)
-		for i, _ := range res.Temperature {
-			c.Check(res.Temperature[i], AlmostChecker, d.Message.Temperature[i], 0.01)
-		}
-
-	}
+	}, []byte{
+		0x99, 0x99,
+		0x4d, 0x06,
+		0x1a, 0xb0,
+		0x01, 0x1c,
+	})
 
 	errorData := []struct {
 		Buffer []byte
 		Ematch string
 	}{
-		{
-			[]byte{},
-			"Invalid buffer size .*",
-		},
 		{
 			[]byte{0xff, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 			"Invalid humidity value",
@@ -158,48 +103,25 @@ func (s *ZeusSuite) TestReportIO(c *C) {
 }
 
 func (s *ZeusSuite) TestConfigIO(c *C) {
-	testData := []struct {
-		Message ZeusConfig
-		Buffer  []byte
-	}{
-		{
-			Message: ZeusConfig{
-				Humidity: PDConfig{
-					ProportionnalMultiplier: 100,
-					DerivativeMultiplier:    50,
-					IntegralMultiplier:      1,
-					DividerPower:            6,
-				},
-				Temperature: PDConfig{
-					ProportionnalMultiplier: 103,
-					DerivativeMultiplier:    102,
-					IntegralMultiplier:      0,
-					DividerPower:            4,
-				},
-			},
-			Buffer: []byte{
-				100, 50, 1, 6, 103, 102, 0, 4,
-			},
+
+	checkMessageEncoding(c, &ZeusConfig{
+		Humidity: PDConfig{
+			ProportionnalMultiplier: 100,
+			DerivativeMultiplier:    50,
+			IntegralMultiplier:      1,
+			DividerPower:            6,
 		},
-	}
+		Temperature: PDConfig{
+			ProportionnalMultiplier: 103,
+			DerivativeMultiplier:    102,
+			IntegralMultiplier:      0,
+			DividerPower:            4,
+		},
+	}, []byte{
+		100, 50, 1, 6, 103, 102, 0, 4,
+	})
 
-	for _, d := range testData {
-		res := ZeusConfig{}
-		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
-			continue
-		}
-		c.Check(res, DeepEquals, d.Message)
-	}
-
-	for _, d := range testData {
-		res := make([]byte, 8)
-		n, err := d.Message.Marshall(res)
-		if c.Check(err, IsNil) == false {
-			continue
-		}
-		c.Check(n, Equals, 8)
-		c.Check(res, DeepEquals, d.Buffer)
-	}
+	checkMessageLength(c, &ZeusConfig{}, 8)
 
 	errorData := []struct {
 		Message ZeusConfig
@@ -228,141 +150,44 @@ func (s *ZeusSuite) TestConfigIO(c *C) {
 		c.Check(err, ErrorMatches, d.Ematch)
 	}
 
-	m := ZeusConfig{}
-	c.Check(m.Unmarshall([]byte{}), ErrorMatches, "Invalid buffer size .*")
 }
 
 func (s *ZeusSuite) TestStatusIO(c *C) {
-	testData := []struct {
-		Message ZeusStatus
-		Buffer  []byte
-	}{
-		{
-			Message: ZeusStatus{
-				Status: ZeusIdle,
-				Fans: [3]FanStatusAndRPM{
-					1200,
-					FanStatusAndRPM(0 | (uint16(FanStalled) << 14)),
-					FanStatusAndRPM(400 | (uint16(FanAging) << 14)),
-				},
-			},
-			Buffer: []byte{
-				0, 0xb0, 0x04, 0x00, 0x80, 0x90, 0x41,
-			},
+	checkMessageEncoding(c, &ZeusStatus{
+		Status: ZeusIdle,
+		Fans: [3]FanStatusAndRPM{
+			1200,
+			FanStatusAndRPM(0 | (uint16(FanStalled) << 14)),
+			FanStatusAndRPM(400 | (uint16(FanAging) << 14)),
 		},
-	}
-
-	for _, d := range testData {
-		res := ZeusStatus{}
-		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
-			continue
-		}
-		c.Check(res, DeepEquals, d.Message)
-	}
-
-	errorData := []struct {
-		Buffer []byte
-		Ematch string
-	}{
-		{
-			make([]byte, 0),
-			"Invalid buffer size .*",
-		},
-	}
-
-	for _, d := range errorData {
-		m := ZeusStatus{}
-		err := m.Unmarshall(d.Buffer)
-		c.Check(err, ErrorMatches, d.Ematch)
-	}
-
+	}, []byte{
+		0, 0xb0, 0x04, 0x00, 0x80, 0x90, 0x41,
+	})
+	checkMessageLength(c, &ZeusStatus{}, 7)
 }
 
 func (s *ZeusSuite) TestControlPointIO(c *C) {
-	testData := []struct {
-		Message ZeusControlPoint
-		Buffer  []byte
-	}{
-		{
-			Message: ZeusControlPoint{
-				Humidity:    1234,
-				Temperature: -275,
-			},
-			Buffer: []byte{
-				0xd2, 0x04, 0xed, 0xfe,
-			},
-		},
-	}
+	checkMessageEncoding(c, &ZeusControlPoint{
+		Humidity:    1234,
+		Temperature: -275,
+	}, []byte{
+		0xd2, 0x04, 0xed, 0xfe,
+	})
 
-	for _, d := range testData {
-		res := ZeusControlPoint{}
-		if c.Check(res.Unmarshall(d.Buffer), IsNil) == false {
-			continue
-		}
-		c.Check(res, DeepEquals, d.Message)
-	}
-
-	errorData := []struct {
-		Buffer []byte
-		Ematch string
-	}{
-		{
-			make([]byte, 0),
-			"Invalid buffer size .*",
-		},
-	}
-
-	for _, d := range errorData {
-		m := ZeusControlPoint{}
-		err := m.Unmarshall(d.Buffer)
-		c.Check(err, ErrorMatches, d.Ematch)
-	}
-
+	checkMessageLength(c, &ZeusControlPoint{}, 4)
 }
 
 func (s *ZeusSuite) TestTemperatureDelta(c *C) {
-	testData := []struct {
-		Message ZeusDeltaTemperature
-		Buffer  []byte
-	}{
-		{
-			Message: ZeusDeltaTemperature{
-				Delta: [4]float32{0, 0, 0, 0},
-			},
-			Buffer: []byte{
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-			},
-		},
-		{
-			Message: ZeusDeltaTemperature{
-				Delta: [4]float32{-0.75540227078, 2.625, -1, 0},
-			},
-			Buffer: []byte{
-				0xb5, 0xff, 42, 0x00, 0xf0, 0xff, 0x00, 0x00,
-			},
-		},
-	}
+	checkMessageEncoding(c, &ZeusDeltaTemperature{
+		Delta: [4]float32{0, 0, 0, 0},
+	}, []byte{
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	})
+	checkMessageEncoding(c, &ZeusDeltaTemperature{
+		Delta: [4]float32{-0.75540227078, 2.625, -1, 0},
+	}, []byte{
+		0xb5, 0xff, 42, 0x00, 0xf0, 0xff, 0x00, 0x00,
+	})
 
-	for _, d := range testData {
-		m := ZeusDeltaTemperature{}
-		err := m.Unmarshall(d.Buffer)
-		if c.Check(err, IsNil) == false {
-			continue
-		}
-		c.Check(m, DeepEquals, d.Message)
-	}
-
-	for _, d := range testData {
-		res := make([]byte, 8)
-		n, err := d.Message.Marshall(res)
-		if c.Check(err, IsNil) == false {
-			continue
-		}
-		c.Check(n, Equals, 8)
-		c.Check(res, DeepEquals, d.Buffer)
-	}
-
-	m := ZeusDeltaTemperature{}
-	c.Check(m.Unmarshall([]byte{}), ErrorMatches, "Invalid buffer size .*")
-
+	checkMessageLength(c, &ZeusDeltaTemperature{}, 8)
 }

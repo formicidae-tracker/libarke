@@ -14,24 +14,24 @@ func (m *CelaenoSetPoint) MessageClassID() MessageClass {
 	return CelaenoSetPointMessage
 }
 
-func (c CelaenoSetPoint) Marshall(buf []byte) (int, error) {
+func (m CelaenoSetPoint) Marshall(buf []byte) (int, error) {
 	if err := checkSize(buf, 1); err != nil {
 		return 0, err
 	}
-	buf[0] = c.Power
+	buf[0] = m.Power
 	return 1, nil
 }
 
-func (c *CelaenoSetPoint) Unmarshall(buf []byte) error {
+func (m *CelaenoSetPoint) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 1); err != nil {
 		return err
 	}
-	c.Power = buf[0]
+	m.Power = buf[0]
 	return nil
 }
 
-func (c *CelaenoSetPoint) String() string {
-	return fmt.Sprintf("Celaeno.SetPoint{Power: %d}", c.Power)
+func (m *CelaenoSetPoint) String() string {
+	return fmt.Sprintf("Celaeno.SetPoint{Power: %d}", m.Power)
 }
 
 type WaterLevelStatus uint8
@@ -63,19 +63,19 @@ func (m *CelaenoStatus) Marshall(buf []byte) (int, error) {
 	return 3, nil
 }
 
-func (c *CelaenoStatus) Unmarshall(buf []byte) error {
+func (m *CelaenoStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 3); err != nil {
 		return err
 	}
 	if buf[0]&0x04 != 0 {
-		c.WaterLevel = CelaenoWaterReadError
+		m.WaterLevel = CelaenoWaterReadError
 	} else if buf[0]&0x02 != 0 {
-		c.WaterLevel = CelaenoWaterCritical
+		m.WaterLevel = CelaenoWaterCritical
 	} else {
-		c.WaterLevel = WaterLevelStatus(buf[0])
+		m.WaterLevel = WaterLevelStatus(buf[0])
 	}
 
-	c.Fan = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
+	m.Fan = FanStatusAndRPM(binary.LittleEndian.Uint16(buf[1:]))
 	return nil
 }
 
@@ -96,8 +96,8 @@ func (s WaterLevelStatus) String() string {
 	return prefix + "nominal"
 }
 
-func (c *CelaenoStatus) String() string {
-	return fmt.Sprintf("Celaeno.Status{WaterLevel: %s, Fan:%s}", c.WaterLevel, c.Fan)
+func (m *CelaenoStatus) String() string {
+	return fmt.Sprintf("Celaeno.Status{WaterLevel: %s, Fan:%s}", m.WaterLevel, m.Fan)
 }
 
 type CelaenoConfig struct {
@@ -121,11 +121,11 @@ func castDuration(t time.Duration) (uint16, error) {
 	return uint16(res), nil
 }
 
-func (c CelaenoConfig) Marshall(buf []byte) (int, error) {
+func (m CelaenoConfig) Marshall(buf []byte) (int, error) {
 	if err := checkSize(buf, 8); err != nil {
 		return 0, err
 	}
-	for i, t := range []time.Duration{c.RampUpTime, c.RampDownTime, c.MinimumOnTime, c.DebounceTime} {
+	for i, t := range []time.Duration{m.RampUpTime, m.RampDownTime, m.MinimumOnTime, m.DebounceTime} {
 		data, err := castDuration(t)
 		if err != nil {
 			return 2 * i, err
@@ -135,23 +135,23 @@ func (c CelaenoConfig) Marshall(buf []byte) (int, error) {
 	return 8, nil
 }
 
-func (c *CelaenoConfig) Unmarshall(buf []byte) error {
+func (m *CelaenoConfig) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
 	}
-	c.RampUpTime = time.Duration(binary.LittleEndian.Uint16(buf[0:])) * time.Millisecond
-	c.RampDownTime = time.Duration(binary.LittleEndian.Uint16(buf[2:])) * time.Millisecond
-	c.MinimumOnTime = time.Duration(binary.LittleEndian.Uint16(buf[4:])) * time.Millisecond
-	c.DebounceTime = time.Duration(binary.LittleEndian.Uint16(buf[6:])) * time.Millisecond
+	m.RampUpTime = time.Duration(binary.LittleEndian.Uint16(buf[0:])) * time.Millisecond
+	m.RampDownTime = time.Duration(binary.LittleEndian.Uint16(buf[2:])) * time.Millisecond
+	m.MinimumOnTime = time.Duration(binary.LittleEndian.Uint16(buf[4:])) * time.Millisecond
+	m.DebounceTime = time.Duration(binary.LittleEndian.Uint16(buf[6:])) * time.Millisecond
 	return nil
 }
 
-func (c *CelaenoConfig) String() string {
+func (m *CelaenoConfig) String() string {
 	return fmt.Sprintf("Celaeno.Config{RampUp: %s, RampDown: %s, MinimumOn: %s, Debounce: %s}",
-		c.RampUpTime,
-		c.RampDownTime,
-		c.MinimumOnTime,
-		c.DebounceTime)
+		m.RampUpTime,
+		m.RampDownTime,
+		m.MinimumOnTime,
+		m.DebounceTime)
 }
 
 func init() {

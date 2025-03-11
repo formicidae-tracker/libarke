@@ -1,6 +1,8 @@
 package arke
 
-import "math"
+import (
+	"math"
+)
 
 const hih6030Max = 16382
 
@@ -43,4 +45,15 @@ func tmp1075BinaryToFloat(value uint16) float32 {
 		value = 0xf000 | value
 	}
 	return float32(int16(value)) * 0.0625
+}
+
+const MAX_INT12 uint16 = (1 << 11) - 1
+
+func tmp1075FloatToBinaray(value float32) uint16 {
+	if value >= 0 {
+		return max(0, min(MAX_INT12, uint16(value/0.0625)))
+	} else if value <= -128.0 {
+		return 0x0800
+	}
+	return (0xffff - max(0, min(MAX_INT12, uint16(-value/0.0625))) + 1) & 0xfff
 }

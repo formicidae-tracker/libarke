@@ -49,9 +49,9 @@ func (m *ZeusSetPoint) Unmarshall(buf []byte) error {
 	return nil
 }
 
-func (sp *ZeusSetPoint) String() string {
+func (m *ZeusSetPoint) String() string {
 	return fmt.Sprintf("Zeus.SetPoint{Humidity: %.2f%%, Temperature: %.2f°C, Wind: %d}",
-		sp.Humidity, sp.Temperature, sp.Wind)
+		m.Humidity, m.Temperature, m.Wind)
 }
 
 type ZeusReport struct {
@@ -69,12 +69,23 @@ func (m ZeusReport) Marshall(buf []byte) (int, error) {
 	}
 	packed := make([]uint16, 4)
 	binTemp := hih6030TemperatureFloatToBinary(m.Temperature[0])
-
+	auxs := []uint16{
+		tmp1075FloatToBinaray(m.Temperature[1]),
+		tmp1075FloatToBinaray(m.Temperature[2]),
+		tmp1075FloatToBinaray(m.Temperature[3]),
+	}
 	packed[0] = humidityFloatToBinary(m.Humidity) | (binTemp << 14)
-	packed[1] = binTemp << 2
+	packed[1] = binTemp>>2 | (auxs[0]&0xf)<<12
+	packed[2] = auxs[0]>>4 | (auxs[1]&0xff)<<8
+	packed[3] = auxs[1]>>8 | (auxs[2]&0xfff)<<4
+
+	for i, word := range packed {
+		binary.LittleEndian.PutUint16(buf[2*i:], word)
+	}
 
 	return 8, nil
 }
+
 func (m *ZeusReport) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
@@ -100,9 +111,9 @@ func (m *ZeusReport) Unmarshall(buf []byte) error {
 	return nil
 }
 
-func (sp *ZeusReport) String() string {
+func (m *ZeusReport) String() string {
 	return fmt.Sprintf("Zeus.Report{Humidity: %.2f%%, Ant: %.2f°C, Aux1: %.2f°C, Aux2: %.2f°C, Aux3: %.2f°C}",
-		sp.Humidity, sp.Temperature[0], sp.Temperature[1], sp.Temperature[2], sp.Temperature[3])
+		m.Humidity, m.Temperature[0], m.Temperature[1], m.Temperature[2], m.Temperature[3])
 }
 
 type ZeusConfig struct {
@@ -110,9 +121,9 @@ type ZeusConfig struct {
 	Temperature PDConfig
 }
 
-func (c *ZeusConfig) String() string {
+func (m *ZeusConfig) String() string {
 	return fmt.Sprintf("Zeus.Config{Humidity:%s, Temperature:%s}",
-		c.Humidity, c.Temperature)
+		m.Humidity, m.Temperature)
 }
 
 func (m *ZeusConfig) MessageClassID() MessageClass {
@@ -216,10 +227,10 @@ type ZeusControlPoint struct {
 	Temperature int16
 }
 
-func (cp *ZeusControlPoint) String() string {
+func (m *ZeusControlPoint) String() string {
 	return fmt.Sprintf("Zeus.ControlPoint{Humidity: %d, Temperature: %d}",
-		cp.Humidity,
-		cp.Temperature,
+		m.Humidity,
+		m.Temperature,
 	)
 }
 
@@ -229,7 +240,7 @@ func (m *ZeusControlPoint) MessageClassID() MessageClass {
 
 func (m *ZeusControlPoint) Marshall(buf []byte) (int, error) {
 	if err := checkSize(buf, 4); err != nil {
-		return 0, nil
+		return 0, err
 	}
 	binary.LittleEndian.PutUint16(buf[0:], uint16(m.Humidity))
 	binary.LittleEndian.PutUint16(buf[2:], uint16(m.Temperature))
@@ -249,12 +260,12 @@ type ZeusDeltaTemperature struct {
 	Delta [4]float32
 }
 
-func (d *ZeusDeltaTemperature) String() string {
+func (m *ZeusDeltaTemperature) String() string {
 	return fmt.Sprintf("Zeus.DeltaTemperature{Ants: %.4f°C, Aux1: %.4f°C, Aux2: %.4f°C, Aux3: %.4f°C}",
-		d.Delta[0],
-		d.Delta[1],
-		d.Delta[2],
-		d.Delta[3],
+		m.Delta[0],
+		m.Delta[1],
+		m.Delta[2],
+		m.Delta[3],
 	)
 }
 
@@ -263,6 +274,10 @@ func (m *ZeusDeltaTemperature) MessageClassID() MessageClass {
 }
 
 func (m *ZeusDeltaTemperature) Marshall(buf []byte) (int, error) {
+	if err := checkSize(buf, 8); err != nil {
+		return 0, err
+	}
+
 	binary.LittleEndian.PutUint16(buf[0:], uint16(int16(m.Delta[0]*float32(hih6030Max)/165.0)))
 	for i := 1; i < 4; i++ {
 		binary.LittleEndian.PutUint16(buf[(2*i):], uint16(int16(m.Delta[i]/0.0625)))
