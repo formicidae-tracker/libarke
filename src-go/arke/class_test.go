@@ -22,6 +22,8 @@ func (s *ClassSuite) TestNameMapping(c *C) {
 		{Name: "celaeno", Class: CelaenoClass},
 		{Name: "Helios", Class: HeliosClass},
 		{Name: "helios", Class: HeliosClass},
+		{Name: "Notus", Class: NotusClass},
+		{Name: "notus", Class: NotusClass},
 		{Name: "Broadcast", Class: 0},
 	}
 

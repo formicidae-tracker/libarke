@@ -61,6 +61,10 @@ func (m *HeliosPulseMode) MessageClassID() MessageClass {
 	return HeliosPulseModeMessage
 }
 
+func (c *HeliosPulseMode) String() string {
+	return fmt.Sprintf("Helios.PulseMode{Period: %s}", c.Period)
+}
+
 type HeliosTriggerMode struct {
 	Period      time.Duration
 	PulseLength time.Duration
@@ -88,8 +92,12 @@ func (m *HeliosTriggerMode) MessageClassID() MessageClass {
 	return HeliosTriggerModeMessage
 }
 
+func (m *HeliosTriggerMode) String() string {
+	return fmt.Sprintf("Helios.TriggerMode{Period: %s, PulseLength: %s}", m.Period, m.PulseLength)
+}
+
 func init() {
-	messageFactory[HeliosSetPointMessage] = func() ReceivableMessage { return &HeliosSetPoint{} }
+	messageFactory[HeliosSetPointMessage] = func() Message { return &HeliosSetPoint{} }
 	messagesName[HeliosSetPointMessage] = "Helios.SetPoint"
 	messagesName[HeliosPulseModeMessage] = "Helios.PulseMode"
 	messagesName[HeliosTriggerModeMessage] = "Helios.TriggerMode"

@@ -18,7 +18,7 @@ func (m *ZeusSetPoint) MessageClassID() MessageClass {
 
 func checkSize(buf []byte, expected int) error {
 	if len(buf) < expected {
-		return fmt.Errorf("Invalid buffer size %d, required %d", len(buf), expected)
+		return fmt.Errorf("Invalid buffer size %d, required: %d", len(buf), expected)
 	}
 	return nil
 }
@@ -63,6 +63,18 @@ func (m *ZeusReport) MessageClassID() MessageClass {
 	return ZeusReportMessage
 }
 
+func (m ZeusReport) Marshall(buf []byte) (int, error) {
+	if err := checkSize(buf, 8); err != nil {
+		return 0, err
+	}
+	packed := make([]uint16, 4)
+	binTemp := hih6030TemperatureFloatToBinary(m.Temperature[0])
+
+	packed[0] = humidityFloatToBinary(m.Humidity) | (binTemp << 14)
+	packed[1] = binTemp << 2
+
+	return 8, nil
+}
 func (m *ZeusReport) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
@@ -177,6 +189,17 @@ func (m *ZeusStatus) MessageClassID() MessageClass {
 	return ZeusStatusMessage
 }
 
+func (m ZeusStatus) Marshall(buf []byte) (int, error) {
+	if err := checkSize(buf, 7); err != nil {
+		return 0, err
+	}
+	buf[0] = byte(m.Status)
+	binary.LittleEndian.PutUint16(buf[1:], uint16(m.Fans[0]))
+	binary.LittleEndian.PutUint16(buf[3:], uint16(m.Fans[1]))
+	binary.LittleEndian.PutUint16(buf[5:], uint16(m.Fans[2]))
+	return 7, nil
+}
+
 func (m *ZeusStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 7); err != nil {
 		return err
@@ -202,6 +225,15 @@ func (cp *ZeusControlPoint) String() string {
 
 func (m *ZeusControlPoint) MessageClassID() MessageClass {
 	return ZeusControlPointMessage
+}
+
+func (m *ZeusControlPoint) Marshall(buf []byte) (int, error) {
+	if err := checkSize(buf, 4); err != nil {
+		return 0, nil
+	}
+	binary.LittleEndian.PutUint16(buf[0:], uint16(m.Humidity))
+	binary.LittleEndian.PutUint16(buf[2:], uint16(m.Temperature))
+	return 4, nil
 }
 
 func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
@@ -252,17 +284,17 @@ func (m *ZeusDeltaTemperature) Unmarshall(buf []byte) error {
 }
 
 func init() {
-	messageFactory[ZeusSetPointMessage] = func() ReceivableMessage { return &ZeusSetPoint{} }
+	messageFactory[ZeusSetPointMessage] = func() Message { return &ZeusSetPoint{} }
 	messagesName[ZeusSetPointMessage] = "Zeus.SetPoint"
-	messageFactory[ZeusReportMessage] = func() ReceivableMessage { return &ZeusReport{} }
+	messageFactory[ZeusReportMessage] = func() Message { return &ZeusReport{} }
 	messagesName[ZeusReportMessage] = "Zeus.Report"
-	messageFactory[ZeusConfigMessage] = func() ReceivableMessage { return &ZeusConfig{} }
+	messageFactory[ZeusConfigMessage] = func() Message { return &ZeusConfig{} }
 	messagesName[ZeusConfigMessage] = "Zeus.Config"
-	messageFactory[ZeusStatusMessage] = func() ReceivableMessage { return &ZeusStatus{} }
+	messageFactory[ZeusStatusMessage] = func() Message { return &ZeusStatus{} }
 	messagesName[ZeusStatusMessage] = "Zeus.Status"
-	messageFactory[ZeusControlPointMessage] = func() ReceivableMessage { return &ZeusControlPoint{} }
+	messageFactory[ZeusControlPointMessage] = func() Message { return &ZeusControlPoint{} }
 	messagesName[ZeusControlPointMessage] = "Zeus.ControlPoint"
-	messageFactory[ZeusDeltaTemperatureMessage] = func() ReceivableMessage { return &ZeusDeltaTemperature{} }
+	messageFactory[ZeusDeltaTemperatureMessage] = func() Message { return &ZeusDeltaTemperature{} }
 	messagesName[ZeusDeltaTemperatureMessage] = "Zeus.DeltaTemperature"
 	messagesName[ZeusVibrationReportMessage] = "Zeus.VibrationReport"
 }

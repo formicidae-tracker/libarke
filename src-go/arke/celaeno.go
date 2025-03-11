@@ -52,6 +52,17 @@ func (m *CelaenoStatus) MessageClassID() MessageClass {
 	return CelaenoStatusMessage
 }
 
+func (m *CelaenoStatus) Marshall(buf []byte) (int, error) {
+	if err := checkSize(buf, 3); err != nil {
+		return 0, err
+	}
+
+	buf[0] = byte(m.WaterLevel)
+	binary.LittleEndian.PutUint16(buf[1:], uint16(m.Fan))
+
+	return 3, nil
+}
+
 func (c *CelaenoStatus) Unmarshall(buf []byte) error {
 	if err := checkSize(buf, 3); err != nil {
 		return err
@@ -144,10 +155,10 @@ func (c *CelaenoConfig) String() string {
 }
 
 func init() {
-	messageFactory[CelaenoSetPointMessage] = func() ReceivableMessage { return &CelaenoSetPoint{} }
+	messageFactory[CelaenoSetPointMessage] = func() Message { return &CelaenoSetPoint{} }
 	messagesName[CelaenoSetPointMessage] = "Celaeno.SetPoint"
-	messageFactory[CelaenoStatusMessage] = func() ReceivableMessage { return &CelaenoStatus{} }
+	messageFactory[CelaenoStatusMessage] = func() Message { return &CelaenoStatus{} }
 	messagesName[CelaenoStatusMessage] = "Celaeno.Status"
-	messageFactory[CelaenoConfigMessage] = func() ReceivableMessage { return &CelaenoConfig{} }
+	messageFactory[CelaenoConfigMessage] = func() Message { return &CelaenoConfig{} }
 	messagesName[CelaenoConfigMessage] = "Celaeno.Config"
 }

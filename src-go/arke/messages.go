@@ -79,6 +79,7 @@ type Unmarshaller interface {
 
 type identifiable interface {
 	MessageClassID() MessageClass
+	String() string
 }
 
 type SendableMessage interface {
@@ -89,7 +90,6 @@ type SendableMessage interface {
 type ReceivableMessage interface {
 	Unmarshaller
 	identifiable
-	String() string
 }
 
 type Message interface {
@@ -141,7 +141,7 @@ func RequestMessage(itf socketcan.RawInterface, m ReceivableMessage, ID NodeID) 
 	})
 }
 
-type messageCreator func() ReceivableMessage
+type messageCreator func() Message
 
 var messageFactory = make(map[MessageClass]messageCreator)
 

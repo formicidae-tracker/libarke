@@ -221,9 +221,12 @@ func (s *MessageSuite) TestMessagesName(c *C) {
 		{ZeusDeltaTemperatureMessage, "Zeus.DeltaTemperature"},
 		{HeliosSetPointMessage, "Helios.SetPoint"},
 		{HeliosPulseModeMessage, "Helios.PulseMode"},
+		{HeliosTriggerModeMessage, "Helios.TriggerMode"},
 		{CelaenoSetPointMessage, "Celaeno.SetPoint"},
 		{CelaenoStatusMessage, "Celaeno.Status"},
 		{CelaenoConfigMessage, "Celaeno.Config"},
+		{NotusSetPointMessage, "Notus.SetPoint"},
+		{NotusConfigMessage, "Notus.Config"},
 		{0, "<unknown>"},
 	}
 

@@ -81,6 +81,16 @@ func (s *FormatSuite) TestFormatting(c *C) {
 			"Helios.SetPoint{Visible: 0, UV: 0}",
 		},
 		{
+			&HeliosPulseMode{Period: 2 * time.Second},
+			"Helios.PulseMode{Period: 2s}",
+		},
+
+		{
+			&HeliosTriggerMode{Period: 40 * time.Millisecond, PulseLength: 3500 * time.Microsecond},
+			"Helios.TriggerMode{Period: 40ms, PulseLength: 3.5ms}",
+		},
+
+		{
 			&HeartBeatData{
 				Class: HeliosClass,
 				ID:    3,
