@@ -23,7 +23,7 @@ func checkSize(buf []byte, expected int) error {
 	return nil
 }
 
-func (m ZeusSetPoint) Marshall(buf []byte) (int, error) {
+func (m ZeusSetPoint) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 5); err != nil {
 		return 0, err
 	}
@@ -33,7 +33,7 @@ func (m ZeusSetPoint) Marshall(buf []byte) (int, error) {
 	return 5, nil
 }
 
-func (m *ZeusSetPoint) Unmarshall(buf []byte) error {
+func (m *ZeusSetPoint) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 5); err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (m *ZeusReport) MessageClassID() MessageClass {
 	return ZeusReportMessage
 }
 
-func (m ZeusReport) Marshall(buf []byte) (int, error) {
+func (m ZeusReport) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 8); err != nil {
 		return 0, err
 	}
@@ -86,7 +86,7 @@ func (m ZeusReport) Marshall(buf []byte) (int, error) {
 	return 8, nil
 }
 
-func (m *ZeusReport) Unmarshall(buf []byte) error {
+func (m *ZeusReport) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (m *ZeusConfig) MessageClassID() MessageClass {
 	return ZeusConfigMessage
 }
 
-func (m ZeusConfig) Marshall(buf []byte) (int, error) {
+func (m ZeusConfig) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 8); err != nil {
 		return 0, err
 	}
@@ -143,7 +143,7 @@ func (m ZeusConfig) Marshall(buf []byte) (int, error) {
 	return 8, nil
 }
 
-func (m *ZeusConfig) Unmarshall(buf []byte) error {
+func (m *ZeusConfig) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (m *ZeusStatus) MessageClassID() MessageClass {
 	return ZeusStatusMessage
 }
 
-func (m ZeusStatus) Marshall(buf []byte) (int, error) {
+func (m ZeusStatus) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 7); err != nil {
 		return 0, err
 	}
@@ -211,7 +211,7 @@ func (m ZeusStatus) Marshall(buf []byte) (int, error) {
 	return 7, nil
 }
 
-func (m *ZeusStatus) Unmarshall(buf []byte) error {
+func (m *ZeusStatus) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 7); err != nil {
 		return err
 	}
@@ -238,7 +238,7 @@ func (m *ZeusControlPoint) MessageClassID() MessageClass {
 	return ZeusControlPointMessage
 }
 
-func (m *ZeusControlPoint) Marshall(buf []byte) (int, error) {
+func (m *ZeusControlPoint) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 4); err != nil {
 		return 0, err
 	}
@@ -247,7 +247,7 @@ func (m *ZeusControlPoint) Marshall(buf []byte) (int, error) {
 	return 4, nil
 }
 
-func (m *ZeusControlPoint) Unmarshall(buf []byte) error {
+func (m *ZeusControlPoint) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 4); err != nil {
 		return err
 	}
@@ -273,7 +273,7 @@ func (m *ZeusDeltaTemperature) MessageClassID() MessageClass {
 	return ZeusDeltaTemperatureMessage
 }
 
-func (m *ZeusDeltaTemperature) Marshall(buf []byte) (int, error) {
+func (m *ZeusDeltaTemperature) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 8); err != nil {
 		return 0, err
 	}
@@ -285,7 +285,7 @@ func (m *ZeusDeltaTemperature) Marshall(buf []byte) (int, error) {
 	return 8, nil
 }
 
-func (m *ZeusDeltaTemperature) Unmarshall(buf []byte) error {
+func (m *ZeusDeltaTemperature) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
 	}

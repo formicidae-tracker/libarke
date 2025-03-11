@@ -45,6 +45,6 @@ func (s *CelaenoSuite) TestConfig(c *C) {
 	m := CelaenoConfig{
 		RampDownTime: (1 << 16) * time.Millisecond,
 	}
-	_, err := m.Marshall(make([]byte, 8))
+	_, err := m.Marshal(make([]byte, 8))
 	c.Check(err, ErrorMatches, "Time constant overflow")
 }

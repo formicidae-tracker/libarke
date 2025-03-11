@@ -14,7 +14,7 @@ func (m *CelaenoSetPoint) MessageClassID() MessageClass {
 	return CelaenoSetPointMessage
 }
 
-func (m CelaenoSetPoint) Marshall(buf []byte) (int, error) {
+func (m CelaenoSetPoint) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 1); err != nil {
 		return 0, err
 	}
@@ -22,7 +22,7 @@ func (m CelaenoSetPoint) Marshall(buf []byte) (int, error) {
 	return 1, nil
 }
 
-func (m *CelaenoSetPoint) Unmarshall(buf []byte) error {
+func (m *CelaenoSetPoint) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 1); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (m *CelaenoStatus) MessageClassID() MessageClass {
 	return CelaenoStatusMessage
 }
 
-func (m *CelaenoStatus) Marshall(buf []byte) (int, error) {
+func (m *CelaenoStatus) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 3); err != nil {
 		return 0, err
 	}
@@ -63,7 +63,7 @@ func (m *CelaenoStatus) Marshall(buf []byte) (int, error) {
 	return 3, nil
 }
 
-func (m *CelaenoStatus) Unmarshall(buf []byte) error {
+func (m *CelaenoStatus) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 3); err != nil {
 		return err
 	}
@@ -121,7 +121,7 @@ func castDuration(t time.Duration) (uint16, error) {
 	return uint16(res), nil
 }
 
-func (m CelaenoConfig) Marshall(buf []byte) (int, error) {
+func (m CelaenoConfig) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 8); err != nil {
 		return 0, err
 	}
@@ -135,7 +135,7 @@ func (m CelaenoConfig) Marshall(buf []byte) (int, error) {
 	return 8, nil
 }
 
-func (m *CelaenoConfig) Unmarshall(buf []byte) error {
+func (m *CelaenoConfig) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 8); err != nil {
 		return err
 	}

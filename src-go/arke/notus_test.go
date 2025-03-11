@@ -13,11 +13,11 @@ var _ = Suite(&NotusSuite{})
 func checkMessageEncoding(c *C, m Message, buffer []byte) {
 	parsed := messageFactory[m.MessageClassID()]()
 
-	if c.Check(parsed.Unmarshall(buffer), IsNil) == true {
+	if c.Check(parsed.Unmarshal(buffer), IsNil) == true {
 		c.Check(parsed, DeepEquals, m)
 	}
 	resBuffer := make([]byte, len(buffer))
-	n, err := m.Marshall(resBuffer)
+	n, err := m.Marshal(resBuffer)
 	if c.Check(err, IsNil) == false {
 		return
 	}
@@ -27,9 +27,9 @@ func checkMessageEncoding(c *C, m Message, buffer []byte) {
 }
 
 func checkMessageLength(c *C, m Message, size int) {
-	_, err := m.Marshall([]byte{})
+	_, err := m.Marshal([]byte{})
 	c.Check(err, ErrorMatches, fmt.Sprintf("Invalid buffer size 0, required: %d", size))
-	c.Check(m.Unmarshall([]byte{}), ErrorMatches, fmt.Sprintf("Invalid buffer size 0, required: %d", size))
+	c.Check(m.Unmarshal([]byte{}), ErrorMatches, fmt.Sprintf("Invalid buffer size 0, required: %d", size))
 }
 
 func (s *NotusSuite) TestSetPoint(c *C) {

@@ -204,7 +204,7 @@ func (s *MessageSuite) TestMessageParsing(c *C) {
 	}
 
 	// does nothing
-	c.Check((&MessageRequestData{}).Unmarshall(nil), Equals, nil)
+	c.Check((&MessageRequestData{}).Unmarshal(nil), Equals, nil)
 }
 
 func (s *MessageSuite) TestMessagesName(c *C) {

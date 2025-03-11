@@ -14,7 +14,7 @@ func (m *NotusSetPoint) MessageClassID() MessageClass {
 	return NotusSetPointMessage
 }
 
-func (m NotusSetPoint) Marshall(buf []byte) (int, error) {
+func (m NotusSetPoint) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 1); err != nil {
 		return 0, err
 	}
@@ -22,7 +22,7 @@ func (m NotusSetPoint) Marshall(buf []byte) (int, error) {
 	return 1, nil
 }
 
-func (m *NotusSetPoint) Unmarshall(buf []byte) error {
+func (m *NotusSetPoint) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 1); err != nil {
 		return err
 	}

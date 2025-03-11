@@ -11,7 +11,7 @@ type HeliosSetPoint struct {
 	UV      uint8
 }
 
-func (m HeliosSetPoint) Marshall(buf []byte) (int, error) {
+func (m HeliosSetPoint) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 2); err != nil {
 		return 0, err
 	}
@@ -20,7 +20,7 @@ func (m HeliosSetPoint) Marshall(buf []byte) (int, error) {
 	return 2, nil
 }
 
-func (m *HeliosSetPoint) Unmarshall(buf []byte) error {
+func (m *HeliosSetPoint) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 2); err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (m HeliosPulseMode) Marshall(buf []byte) (int, error) {
 	return 2, nil
 }
 
-func (m *HeliosPulseMode) Unmarshall(buf []byte) error {
+func (m *HeliosPulseMode) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 2); err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (m HeliosTriggerMode) Marshall(buf []byte) (int, error) {
 	return 4, nil
 }
 
-func (m *HeliosTriggerMode) Unmarshall(buf []byte) error {
+func (m *HeliosTriggerMode) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 4); err != nil {
 		return err
 	}

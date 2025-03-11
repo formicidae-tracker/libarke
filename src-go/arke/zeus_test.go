@@ -63,7 +63,7 @@ func (s *ZeusSuite) TestSetPointIO(c *C) {
 
 	for _, d := range errorData {
 		m := ZeusSetPoint{}
-		c.Check(m.Unmarshall(d.Buffer), ErrorMatches, d.EMatch)
+		c.Check(m.Unmarshal(d.Buffer), ErrorMatches, d.EMatch)
 	}
 
 }
@@ -98,7 +98,7 @@ func (s *ZeusSuite) TestReportIO(c *C) {
 
 	for _, d := range errorData {
 		m := ZeusReport{}
-		c.Check(m.Unmarshall(d.Buffer), ErrorMatches, d.Ematch)
+		c.Check(m.Unmarshal(d.Buffer), ErrorMatches, d.Ematch)
 	}
 }
 
@@ -146,7 +146,7 @@ func (s *ZeusSuite) TestConfigIO(c *C) {
 	}
 
 	for _, d := range errorData {
-		_, err := d.Message.Marshall(d.Buffer)
+		_, err := d.Message.Marshal(d.Buffer)
 		c.Check(err, ErrorMatches, d.Ematch)
 	}
 

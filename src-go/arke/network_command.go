@@ -81,7 +81,7 @@ func (d *ResetRequestData) String() string {
 	return fmt.Sprintf("arke.ResetRequest{Class: %s, Node: %d}", d.Class, d.ID)
 }
 
-func (d *ResetRequestData) Unmarshall(buf []byte) error {
+func (d *ResetRequestData) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 1); err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (d *HeartBeatRequestData) String() string {
 	return fmt.Sprintf("arke.HeartBeatRequest{Class: %s, Node: All, Period: %s}", d.Class, periodStr)
 }
 
-func (d *HeartBeatRequestData) Unmarshall(buf []byte) error {
+func (d *HeartBeatRequestData) Unmarshal(buf []byte) error {
 	if len(buf) == 0 {
 		d.Period = 0
 		return nil
@@ -133,7 +133,7 @@ func (d *IDChangeRequestData) String() string {
 	return fmt.Sprintf("arke.IDChangeRequest{Class: %s, OldID: %d, NewID: %d}", d.Class, d.Old, d.New)
 }
 
-func (d *IDChangeRequestData) Unmarshall(buf []byte) error {
+func (d *IDChangeRequestData) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 2); err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func (d *ErrorReportData) String() string {
 	return fmt.Sprintf("arke.ErrorReport{Class: %s, ID: %d, ErrorCode: 0x%04x}", d.Class, d.ID, d.ErrorCode)
 }
 
-func (d *ErrorReportData) Unmarshall(buf []byte) error {
+func (d *ErrorReportData) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 4); err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ type HeartBeatData struct {
 	TweakVersion uint8
 }
 
-func (h *HeartBeatData) Unmarshall(buf []byte) error {
+func (h *HeartBeatData) Unmarshal(buf []byte) error {
 	h.MajorVersion = 0
 	h.MinorVersion = 0
 	h.PatchVersion = 0
@@ -222,7 +222,7 @@ func init() {
 		res := &ResetRequestData{
 			Class: NodeClass(c),
 		}
-		if err := res.Unmarshall(buffer); err != nil {
+		if err := res.Unmarshal(buffer); err != nil {
 			return nil, 0, err
 		}
 		return res, res.ID, nil
@@ -232,7 +232,7 @@ func init() {
 		res := &IDChangeRequestData{
 			Class: NodeClass(c),
 		}
-		if err := res.Unmarshall(buffer); err != nil {
+		if err := res.Unmarshal(buffer); err != nil {
 			return nil, 0, err
 		}
 		return res, res.Old, nil
@@ -242,7 +242,7 @@ func init() {
 		res := &HeartBeatRequestData{
 			Class: NodeClass(c),
 		}
-		if err := res.Unmarshall(buffer); err != nil {
+		if err := res.Unmarshal(buffer); err != nil {
 			return nil, 0, err
 		}
 
@@ -251,7 +251,7 @@ func init() {
 
 	networkCommandFactory[NodeID(ErrorReport)] = func(c MessageClass, buffer []byte) (ReceivableMessage, NodeID, error) {
 		res := &ErrorReportData{}
-		if err := res.Unmarshall(buffer); err != nil {
+		if err := res.Unmarshal(buffer); err != nil {
 			return nil, 0, err
 		}
 		return res, res.ID, nil

@@ -69,12 +69,12 @@ func extractCANIDT(idt uint32) (t MessageType, c MessageClass, n NodeID) {
 	return
 }
 
-type Marshaller interface {
-	Marshall([]byte) (int, error)
+type Marshaler interface {
+	Marshal([]byte) (int, error)
 }
 
-type Unmarshaller interface {
-	Unmarshall([]byte) error
+type Unmarshaler interface {
+	Unmarshal([]byte) error
 }
 
 type identifiable interface {
@@ -83,18 +83,18 @@ type identifiable interface {
 }
 
 type SendableMessage interface {
-	Marshaller
+	Marshaler
 	identifiable
 }
 
 type ReceivableMessage interface {
-	Unmarshaller
+	Unmarshaler
 	identifiable
 }
 
 type Message interface {
-	Marshaller
-	Unmarshaller
+	Marshaler
+	Unmarshaler
 	identifiable
 }
 
@@ -120,7 +120,7 @@ func SendMessage(itf socketcan.RawInterface, m SendableMessage, highPriority boo
 		RTR:      false,
 		Data:     make([]byte, 8),
 	}
-	dlc, err := m.Marshall(f.Data)
+	dlc, err := m.Marshal(f.Data)
 	if err != nil {
 		return fmt.Errorf("Could not marshall %v: %s", m, err)
 	}
@@ -174,7 +174,7 @@ func (d *MessageRequestData) String() string {
 	return fmt.Sprintf("arke.MessageRequest{Message:%s, Node: %d}", d.Class, d.ID)
 }
 
-func (d *MessageRequestData) Unmarshall(buf []byte) error {
+func (d *MessageRequestData) Unmarshal(buf []byte) error {
 	return nil
 }
 
@@ -220,7 +220,7 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 
 	if mType == HeartBeat {
 		res := &HeartBeatData{}
-		if err := res.Unmarshall(f.Data[0:f.Dlc]); err != nil {
+		if err := res.Unmarshal(f.Data[0:f.Dlc]); err != nil {
 			return nil, mID, err
 		}
 		res.Class = NodeClass(mClass)
@@ -234,7 +234,7 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 	}
 
 	m := creator()
-	err := m.Unmarshall(f.Data[0:f.Dlc])
+	err := m.Unmarshal(f.Data[0:f.Dlc])
 	if err != nil {
 		err = fmt.Errorf("Could not parse message data: %s", err)
 	}
