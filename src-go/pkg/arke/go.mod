@@ -1,4 +1,4 @@
-module github.com/formicidae-tracker/libarke/src-go/arke
+module github.com/formicidae-tracker/libarke/src-go/pkg/arke
 
 require (
 	github.com/atuleu/golang-socketcan v0.2.0
