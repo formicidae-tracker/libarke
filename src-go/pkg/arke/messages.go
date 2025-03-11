@@ -22,6 +22,7 @@ const (
 	ZeusClass      NodeClass = 0x38
 	HeliosClass    NodeClass = 0x34
 	CelaenoClass   NodeClass = 0x30
+	NotusClass     NodeClass = 0x2c
 	NodeClassMask  uint16    = 0x3f << 3
 
 	ResetRequest           MessageClass = 0x00
@@ -49,9 +50,12 @@ const (
 	ZeusDeltaTemperatureMessage   MessageClass = 0x3e
 	HeliosSetPointMessage         MessageClass = 0x34
 	HeliosPulseModeMessage        MessageClass = 0x35
+	HeliosTriggerModeMessage      MessageClass = 0x36
 	CelaenoSetPointMessage        MessageClass = 0x30
 	CelaenoStatusMessage          MessageClass = 0x31
 	CelaenoConfigMessage          MessageClass = 0x32
+	NotusSetPointMessage          MessageClass = 0x2c
+	NotusConfigMessage            MessageClass = 0x2d
 )
 
 func makeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {
