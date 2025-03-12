@@ -58,7 +58,7 @@ const (
 	NotusConfigMessage            MessageClass = 0x2d
 )
 
-func makeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {
+func MakeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {
 	return uint32((uint32(t) << 9) | (uint32(c) << 3) | uint32(n))
 }
 
@@ -115,7 +115,7 @@ func SendMessage(itf socketcan.RawInterface, m SendableMessage, highPriority boo
 	}
 
 	f := socketcan.CanFrame{
-		ID:       makeCANIDT(mType, m.MessageClassID(), ID),
+		ID:       MakeCANIDT(mType, m.MessageClassID(), ID),
 		Extended: false,
 		RTR:      false,
 		Data:     make([]byte, 8),
@@ -133,7 +133,7 @@ func RequestMessage(itf socketcan.RawInterface, m ReceivableMessage, ID NodeID) 
 		return err
 	}
 	return itf.Send(socketcan.CanFrame{
-		ID:       makeCANIDT(StandardMessage, m.MessageClassID(), ID),
+		ID:       MakeCANIDT(StandardMessage, m.MessageClassID(), ID),
 		Extended: false,
 		RTR:      true,
 		Data:     make([]byte, 0),

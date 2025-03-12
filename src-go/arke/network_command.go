@@ -8,9 +8,9 @@ import (
 	socketcan "github.com/atuleu/golang-socketcan"
 )
 
-func SendResetRequest(itf socketcan.RawInterface, c NodeClass, ID NodeID) error {
-	return itf.Send(socketcan.CanFrame{
-		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(ResetRequest)),
+func MakeResetRequest(c NodeClass, ID NodeID) socketcan.CanFrame {
+	return socketcan.CanFrame{
+		ID:       MakeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(ResetRequest)),
 		Dlc:      1,
 		Extended: false,
 		RTR:      false,
@@ -18,51 +18,44 @@ func SendResetRequest(itf socketcan.RawInterface, c NodeClass, ID NodeID) error 
 			byte(ID), 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00,
 		},
-	})
+	}
 }
 
-func Ping(itf socketcan.RawInterface, c NodeClass) error {
-	return itf.Send(socketcan.CanFrame{
-		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(HeartBeatRequest)),
+func MakePing(c NodeClass) socketcan.CanFrame {
+	return socketcan.CanFrame{
+		ID:       MakeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(HeartBeatRequest)),
 		Dlc:      0,
 		Extended: false,
 		RTR:      false,
 		Data:     nil,
-	})
+	}
 }
 
-func SendHeartBeatRequest(itf socketcan.RawInterface, c NodeClass, t time.Duration) error {
+func MakeHeartBeatRequest(c NodeClass, t time.Duration) socketcan.CanFrame {
 	period, err := castDuration(t)
 	if err != nil {
-		return err
+		return socketcan.CanFrame{ID: 0x3ff, Dlc: 0}
 	}
 
 	f := socketcan.CanFrame{
-		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(HeartBeatRequest)),
+		ID:       MakeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(HeartBeatRequest)),
 		Dlc:      2,
 		Extended: false,
 		RTR:      false,
 		Data:     make([]byte, 2),
 	}
 	binary.LittleEndian.PutUint16(f.Data, period)
-	return itf.Send(f)
+	return f
 }
 
-func SendIDChangeRequest(itf socketcan.RawInterface, c NodeClass, original, new NodeID) error {
-	if original == 0 || original > 7 {
-		return fmt.Errorf("Invalid Original ID %d", original)
-	}
-	if new == 0 || new > 7 {
-		return fmt.Errorf("Invalid Target ID %d", new)
-	}
-
-	return itf.Send(socketcan.CanFrame{
-		ID:       makeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(IDChangeRequest)),
+func MakeIDChangeRequest(c NodeClass, original, new NodeID) socketcan.CanFrame {
+	return socketcan.CanFrame{
+		ID:       MakeCANIDT(NetworkControlCommand, MessageClass(c), NodeID(IDChangeRequest)),
 		Dlc:      2,
 		Extended: false,
 		RTR:      false,
 		Data:     []byte{byte(original), byte(new)},
-	})
+	}
 }
 
 type ResetRequestData struct {

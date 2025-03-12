@@ -35,26 +35,26 @@ func (m *NotusSetPoint) String() string {
 }
 
 type NotusConfig struct {
-	RampDownTime time.Duration
-	MinFan       uint8
-	MaxHeat      uint8
+	RampDownTime time.Duration `long:"ramp-down" description:"time to keep fan off on poweroff" default:"2s"`
+	MinFan       uint8         `long:"min-fan" description:"minimum fan power (0-255)" default:"50"`
+	MaxHeat      uint8         `long:"max-fan" description:"maximum heat power (0-255)" default:"200"`
 }
 
-func (m *NotusConfig) MessageClasID() MessageClass {
+func (m *NotusConfig) MessageClassID() MessageClass {
 	return NotusConfigMessage
 }
 
-func (m NotusConfig) Marshall(buf []byte) (int, error) {
+func (m NotusConfig) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 4); err != nil {
 		return 0, err
 	}
-	binary.LittleEndian.AppendUint16(buf[0:], uint16(m.RampDownTime.Milliseconds()))
+	binary.LittleEndian.PutUint16(buf[0:], uint16(m.RampDownTime.Milliseconds()))
 	buf[2] = m.MinFan
 	buf[3] = m.MaxHeat
 	return 4, nil
 }
 
-func (m *NotusConfig) Unmarshall(buf []byte) error {
+func (m *NotusConfig) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 4); err != nil {
 		return err
 	}
@@ -71,6 +71,7 @@ func (m *NotusConfig) String() string {
 
 func init() {
 	messageFactory[NotusSetPointMessage] = func() Message { return &NotusSetPoint{} }
+	messageFactory[NotusConfigMessage] = func() Message { return &NotusConfig{} }
 	messagesName[NotusSetPointMessage] = "Notus.SetPoint"
 	messagesName[NotusConfigMessage] = "Notus.Config"
 }

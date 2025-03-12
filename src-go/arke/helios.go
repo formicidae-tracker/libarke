@@ -7,8 +7,8 @@ import (
 )
 
 type HeliosSetPoint struct {
-	Visible uint8
-	UV      uint8
+	Visible uint8 `positional-arg-name:"visible" required:"yes"`
+	UV      uint8 `positional-arg-name:"UV" required:"yes"`
 }
 
 func (m HeliosSetPoint) Marshal(buf []byte) (int, error) {
@@ -38,10 +38,10 @@ func (m *HeliosSetPoint) String() string {
 }
 
 type HeliosPulseMode struct {
-	Period time.Duration
+	Period time.Duration `positional-arg-name:"period" required:"yes"`
 }
 
-func (m HeliosPulseMode) Marshall(buf []byte) (int, error) {
+func (m HeliosPulseMode) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 2); err != nil {
 		return 0, err
 	}
@@ -66,16 +66,16 @@ func (m *HeliosPulseMode) String() string {
 }
 
 type HeliosTriggerMode struct {
-	Period      time.Duration
-	PulseLength time.Duration
+	Period      time.Duration `positional-arg-name:"period" required:"yes"`
+	PulseLength time.Duration `positional-arg-name:"length" required:"yes"`
 }
 
-func (m HeliosTriggerMode) Marshall(buf []byte) (int, error) {
+func (m HeliosTriggerMode) Marshal(buf []byte) (int, error) {
 	if err := checkSize(buf, 4); err != nil {
 		return 0, err
 	}
-	binary.LittleEndian.AppendUint16(buf[0:], uint16(m.Period.Microseconds()/100))
-	binary.LittleEndian.AppendUint16(buf[2:], uint16(m.PulseLength.Microseconds()))
+	binary.LittleEndian.PutUint16(buf[0:], uint16(m.Period.Microseconds()/100))
+	binary.LittleEndian.PutUint16(buf[2:], uint16(m.PulseLength.Microseconds()))
 	return 4, nil
 }
 
@@ -99,6 +99,8 @@ func (m *HeliosTriggerMode) String() string {
 func init() {
 	messageFactory[HeliosSetPointMessage] = func() Message { return &HeliosSetPoint{} }
 	messagesName[HeliosSetPointMessage] = "Helios.SetPoint"
+	messageFactory[HeliosPulseModeMessage] = func() Message { return &HeliosPulseMode{} }
 	messagesName[HeliosPulseModeMessage] = "Helios.PulseMode"
+	messageFactory[HeliosTriggerModeMessage] = func() Message { return &HeliosTriggerMode{} }
 	messagesName[HeliosTriggerModeMessage] = "Helios.TriggerMode"
 }
