@@ -62,7 +62,7 @@ func MakeCANIDT(t MessageType, c MessageClass, n NodeID) uint32 {
 	return uint32((uint32(t) << 9) | (uint32(c) << 3) | uint32(n))
 }
 
-func extractCANIDT(idt uint32) (t MessageType, c MessageClass, n NodeID) {
+func ExtractCANIDT(idt uint32) (t MessageType, c MessageClass, n NodeID) {
 	n = NodeID(idt & 0x7)
 	c = MessageClass((idt & 0x1f8) >> 3)
 	t = MessageType((idt & 0x600) >> 9)
@@ -179,7 +179,7 @@ func (d *MessageRequestData) Unmarshal(buf []byte) error {
 }
 
 func parseRTR(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
-	mType, mClass, mID := extractCANIDT(f.ID)
+	mType, mClass, mID := ExtractCANIDT(f.ID)
 
 	if f.Dlc > 0 {
 		return nil, 0, fmt.Errorf("RTR frame with a payload")
@@ -209,7 +209,7 @@ func ParseMessage(f *socketcan.CanFrame) (ReceivableMessage, NodeID, error) {
 		return parseRTR(f)
 	}
 
-	mType, mClass, mID := extractCANIDT(f.ID)
+	mType, mClass, mID := ExtractCANIDT(f.ID)
 	if mType == NetworkControlCommand {
 		parser, ok := networkCommandFactory[mID]
 		if ok == false {

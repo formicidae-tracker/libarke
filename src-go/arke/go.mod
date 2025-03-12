@@ -1,6 +1,8 @@
 module github.com/formicidae-tracker/libarke/src-go/arke
 
-go 1.21
+go 1.23.0
+
+toolchain go1.23.7
 
 require (
 	github.com/atuleu/golang-socketcan v0.2.2
@@ -11,5 +13,6 @@ require (
 require (
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/kr/text v0.1.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/term v0.30.0 // indirect
 )

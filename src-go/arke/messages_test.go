@@ -33,7 +33,7 @@ func (s *MessageSuite) TestCANIDTIO(c *C) {
 	}
 
 	for _, d := range testdata {
-		resType, resClass, resID := extractCANIDT(d.IDT)
+		resType, resClass, resID := ExtractCANIDT(d.IDT)
 		c.Check(resType, Equals, d.Type)
 		c.Check(resClass, Equals, d.Class)
 		c.Check(resID, Equals, d.ID)
