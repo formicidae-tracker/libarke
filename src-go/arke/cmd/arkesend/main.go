@@ -59,7 +59,7 @@ func (cmd *ArkeCommand[M]) Execute([]string) error {
 func (o *Options) Send(frame socketcan.CanFrame) error {
 	intf, err := socketcan.NewRawInterface(string(o.Interface))
 	if err != nil {
-		return err
+		return fmt.Errorf("opening CAN interface '%s': %s", o.Interface, err)
 	}
 	defer intf.Close()
 
@@ -80,7 +80,6 @@ func main() {
 		os.Exit(1)
 	}
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s", err)
 		os.Exit(1)
 	}
 }

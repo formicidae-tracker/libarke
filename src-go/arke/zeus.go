@@ -7,9 +7,9 @@ import (
 )
 
 type ZeusSetPoint struct {
-	Humidity    float32
-	Temperature float32
-	Wind        uint8
+	Humidity    float32 `positional-arg-name:"humidity" required:"yes"`
+	Temperature float32 `positional-arg-name:"temperature" required:"yes"`
+	Wind        uint8   `positional-arg-name:"wind" required:"yes"`
 }
 
 func (m *ZeusSetPoint) MessageClassID() MessageClass {

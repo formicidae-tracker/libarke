@@ -7,7 +7,7 @@ import (
 )
 
 type CelaenoSetPoint struct {
-	Power uint8
+	Power uint8 `positional-arg-name:"power" required:"yes"`
 }
 
 func (m *CelaenoSetPoint) MessageClassID() MessageClass {
@@ -101,10 +101,10 @@ func (m *CelaenoStatus) String() string {
 }
 
 type CelaenoConfig struct {
-	RampUpTime    time.Duration
-	RampDownTime  time.Duration
-	MinimumOnTime time.Duration
-	DebounceTime  time.Duration
+	RampUpTime    time.Duration `positional-arg-name:"ramp_up" required:"yes"`
+	RampDownTime  time.Duration `positional-arg-name:"ramp_down" required:"yes"`
+	MinimumOnTime time.Duration `positional-arg-name:"minimum_on" required:"yes"`
+	DebounceTime  time.Duration `positional-arg-name:"debounce_time" required:"yes"`
 }
 
 func (m *CelaenoConfig) MessageClassID() MessageClass {
