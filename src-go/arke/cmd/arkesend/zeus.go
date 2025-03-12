@@ -12,5 +12,13 @@ func init() {
 		"Sets the set point of zeus devices",
 		&ArkeCommand[*arke.ZeusSetPoint]{Args: &arke.ZeusSetPoint{}})
 
-	zeusGetCommand
+	zeusGetCommand := MustAddCommand(getCommand, "zeus",
+		"zeus command group",
+		"Zeus command group",
+		nodeID)
+
+	MustAddCommand(zeusGetCommand, "setPoint",
+		"requests zeus set point",
+		"Requests zeus set point",
+		&Request[*arke.ZeusSetPoint]{message: &arke.ZeusSetPoint{}})
 }

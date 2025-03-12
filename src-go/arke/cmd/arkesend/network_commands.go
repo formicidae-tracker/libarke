@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/formicidae-tracker/libarke/src-go/arke"
@@ -45,6 +46,10 @@ type ChangeIDCommand struct {
 }
 
 func (cmd *ChangeIDCommand) Execute([]string) error {
+	if cmd.Args.Old == 0 || cmd.Args.New == 0 || cmd.Args.Old == cmd.Args.New {
+		return fmt.Errorf("Invalid changeID command old:%d new:%d", cmd.Args.Old, cmd.Args.New)
+	}
+
 	return opts.Send(arke.MakeIDChangeRequest(network.Class.Class(),
 		arke.NodeID(cmd.Args.Old), arke.NodeID(cmd.Args.New)))
 }
@@ -60,19 +65,27 @@ func keys[K comparable, V any](m map[K]V) []K {
 }
 
 func init() {
-	networkCommand, _ := parser.AddCommand("network",
+	networkCommand := MustAddCommand(parser.Command,
+		"network",
 		"network command group",
-		"sends a network command over the CANbus", network)
+		"sends a network command over the CANbus",
+		network)
 	networkCommand.FindOptionByLongName("class").Choices = keys(nodeClassName)
-	networkCommand.AddCommand("reset",
+
+	MustAddCommand(networkCommand, "reset",
 		"sends a reset command",
-		"sends a reset command to a given node", &ResetCommand{})
-	networkCommand.AddCommand("ping",
+		"sends a reset command to a given node",
+		&ResetCommand{})
+	MustAddCommand(networkCommand, "ping",
 		"ping a class of node",
 		"Requests a single heartbeat command to a given class of nodes",
 		&PingCommand{})
-	networkCommand.AddCommand("heartbeat",
+	MustAddCommand(networkCommand, "heartbeat",
 		"requests periodic heartbeats",
 		"Requests a class of nodes to send periodic heartbeat",
 		&HeartbeatCommand{})
+	MustAddCommand(networkCommand, "changeID",
+		"changes a node ID",
+		"Changes a node ID. Old and new cannot be zero and must differ",
+		&ChangeIDCommand{})
 }
