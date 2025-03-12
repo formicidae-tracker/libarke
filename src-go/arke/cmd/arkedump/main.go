@@ -19,8 +19,14 @@ type Options struct {
 
 func execute() error {
 	opts := &Options{}
-	_, err := flags.Parse(opts)
+
+	parser := flags.NewParser(opts, flags.Default)
+	_, err := parser.Parse()
 	if flags.WroteHelp(err) == true {
+		return nil
+	}
+	if ferr, ok := err.(*flags.Error); ok == true && ferr.Type == flags.ErrRequired {
+		parser.WriteHelp(os.Stderr)
 		return nil
 	}
 	if err != nil {
@@ -74,6 +80,6 @@ func execute() error {
 
 func main() {
 	if err := execute(); err != nil {
-		log.Fatalf("Unexpected error: %s", err)
+		os.Exit(1)
 	}
 }
