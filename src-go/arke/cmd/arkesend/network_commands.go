@@ -67,25 +67,25 @@ func keys[K comparable, V any](m map[K]V) []K {
 func init() {
 	networkCommand := MustAddCommand(parser.Command,
 		"network",
-		"network command group",
-		"sends a network command over the CANbus",
+		"Network command group",
+		"A collection of commands generic to each node, to modify ID or ping devices.",
 		network)
 	networkCommand.FindOptionByLongName("class").Choices = keys(nodeClassName)
 
 	MustAddCommand(networkCommand, "reset",
-		"sends a reset command",
-		"sends a reset command to a given node",
+		"Sends a reset command",
+		"Sends a reset command to a given node. It can target all classes or a specific classes and ID.",
 		&ResetCommand{})
 	MustAddCommand(networkCommand, "ping",
-		"ping a class of node",
-		"Requests a single heartbeat command to a given class of nodes",
+		"Pings a class of node",
+		"Requests a single heartbeat command to a given class of nodes. It targets a class, but not individual nodes",
 		&PingCommand{})
 	MustAddCommand(networkCommand, "heartbeat",
-		"requests periodic heartbeats",
-		"Requests a class of nodes to send periodic heartbeat",
+		"Requests periodic heartbeats",
+		"Requests a class of nodes to send periodic heartbeat. It targets a class, but not individual nodes",
 		&HeartbeatCommand{})
 	MustAddCommand(networkCommand, "changeID",
 		"changes a node ID",
-		"Changes a node ID. Old and new cannot be zero and must differ",
+		"Changes a node ID. Old and new cannot be zero and must differs.",
 		&ChangeIDCommand{})
 }

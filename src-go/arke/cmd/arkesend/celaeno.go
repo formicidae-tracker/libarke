@@ -6,40 +6,40 @@ import (
 
 func init() {
 	celaenoCommand := MustAddCommand(parser.Command, "celaeno",
-		"celaeno command group",
-		"sends a command for celaeno devices over the CANbus",
+		"Celaeno command group",
+		"A collection of commands that can be sent to celaeno devices",
 		nodeID)
 	MustAddCommand(celaenoCommand,
 		"setPoint",
-		"sends celaeno set point",
 		"Sends celaeno set point",
+		"Sends celaeno set point. A set point is just a 0-255 int that sets the desired humidification power.",
 		&ArkeCommand[*arke.CelaenoSetPoint]{Args: &arke.CelaenoSetPoint{}})
 
 	MustAddCommand(celaenoCommand, "config",
-		"sends celaeno config",
 		"Sends celaeno config",
+		"Sends celaeno config. This config defines the ramp up time, the ramp down time, the minimum on duration, and the debounce time for the sensor level. these durations should not exceed ~65s",
 		&ArkeCommand[*arke.CelaenoConfig]{Args: &arke.CelaenoConfig{}})
 
 	getCelaenoCommand := MustAddCommand(getCommand, "celaeno",
-		"celaeno command group",
-		"sends a request for celaeno devices over the CANbus",
+		"Celaeno request group",
+		"A collection of request to ask data from celaeno devices",
 		nodeID)
 
 	MustAddCommand(getCelaenoCommand,
 		"setPoint",
-		"requests celaeno set point",
-		"Request celaeno set point",
+		"Requests celaeno set point",
+		"Request celaeno set point. It is a byte indicating the current desired level of humidification.",
 		&Request[*arke.CelaenoSetPoint]{message: &arke.CelaenoSetPoint{}})
 
 	MustAddCommand(getCelaenoCommand,
 		"status",
-		"requests celaeno status",
 		"Requests celaeno status",
+		"Requests celaeno status. It consists of the water level and the fan status.",
 		&Request[*arke.CelaenoStatus]{message: &arke.CelaenoStatus{}})
 
 	MustAddCommand(getCelaenoCommand, "config",
-		"requests celaeno config",
 		"Requests celaeno config",
+		"Requests celaeno config. It consists of the ramp up time, ramp down time, minimum on time, and debounce time.",
 		&Request[*arke.CelaenoConfig]{message: &arke.CelaenoConfig{}})
 
 }

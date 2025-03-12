@@ -6,32 +6,33 @@ import (
 
 func init() {
 	notusCommand := MustAddCommand(parser.Command, "notus",
-		"notus command group",
-		"sends a command for notus devices over the CANbus",
+		"Notus command group",
+		"A collection of commands that can be sent to notus devices.",
 		nodeID)
 
-	MustAddCommand(notusCommand, "setPoint", "sends notus set point",
-		"Sends notus set point to a given node",
+	MustAddCommand(notusCommand, "setPoint",
+		"Sends notus set point",
+		"Sends notus set point. It consist of a byte representing the desired heating power.",
 		&ArkeCommand[*arke.NotusSetPoint]{Args: &arke.NotusSetPoint{}})
 
 	MustAddCommand(notusCommand, "config",
-		"sends config to notus devices",
-		"Sends config to notus devices over the CANbus",
+		"Sends notus config",
+		"Sends notus config. It consists of a ramp-down time, a minimum fan level (byte) when on, and the maximum allowed heating power (byte).",
 		&ArkeCommand[*arke.NotusConfig]{Args: &arke.NotusConfig{}})
 
 	getNotusCommand := MustAddCommand(getCommand, "notus",
-		"notus command group",
-		"sends a request for notus devices over the CANbus",
+		"Notus request group",
+		"A collection of request to poll data from notus devices.",
 		nodeID)
 
 	getNotusCommand.AddCommand("setPoint",
-		"requests notus set point",
 		"Requests notus set point",
+		"Requests notus set point, i.e. a byte representing the current heating power.",
 		&Request[*arke.NotusSetPoint]{message: &arke.NotusSetPoint{}})
 
 	getNotusCommand.AddCommand("config",
-		"requests notus config",
 		"Requests notus config",
+		"Requests notus config. It consists of a ramp down duration, and the minimum fan level and the maximum heating power. Both value are bytes.",
 		&Request[*arke.NotusConfig]{message: &arke.NotusConfig{}})
 
 }

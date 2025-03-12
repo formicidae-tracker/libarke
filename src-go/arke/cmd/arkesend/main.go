@@ -72,6 +72,11 @@ var opts = &Options{}
 var parser = flags.NewParser(opts, flags.Default)
 
 func main() {
+	if len(os.Getenv("GO_FLAGS_MANPAGE")) > 0 {
+		parser.WriteManPage(os.Stdout)
+		return
+	}
+
 	_, err := parser.Parse()
 	if flags.WroteHelp(err) == true {
 		return
