@@ -27,9 +27,10 @@ func (o *Options) buildStandardMessage(m arke.Message, n arke.NodeID, RTR bool) 
 		Data:     make([]byte, 8),
 	}
 
-	size, _ := m.Marshal(frame.Data)
-
-	frame.Dlc = byte(size)
+	if RTR == false {
+		size, _ := m.Marshal(frame.Data)
+		frame.Dlc = byte(size)
+	}
 
 	return frame
 }
