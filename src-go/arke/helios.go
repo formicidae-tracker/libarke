@@ -83,7 +83,7 @@ func (m *HeliosTriggerMode) Unmarshal(buf []byte) error {
 	if err := checkSize(buf, 4); err != nil {
 		return err
 	}
-	m.Period = time.Duration(binary.LittleEndian.Uint16(buf[0:])*100) * time.Microsecond
+	m.Period = time.Duration(binary.LittleEndian.Uint16(buf[0:])) * 100 * time.Microsecond
 	m.PulseLength = time.Duration(binary.LittleEndian.Uint16(buf[2:])) * time.Microsecond
 	return nil
 }

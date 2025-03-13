@@ -23,8 +23,8 @@ func (s *HeliosSuite) TestPulseMode(c *C) {
 
 func (s *HeliosSuite) TestTriggerMode(c *C) {
 	checkMessageEncoding(c, &HeliosTriggerMode{
-		Period:      40 * time.Millisecond,
+		Period:      100 * time.Millisecond,
 		PulseLength: 3200 * time.Microsecond,
-	}, []byte{0x90, 0x01, 0x80, 0x0c})
+	}, []byte{0xe8, 0x03, 0x80, 0x0c})
 	checkMessageLength(c, &HeliosTriggerMode{}, 4)
 }
