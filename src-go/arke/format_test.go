@@ -87,7 +87,7 @@ func (s *FormatSuite) TestFormatting(c *C) {
 
 		{
 			&HeliosTriggerMode{Period: 40 * time.Millisecond, PulseLength: 3500 * time.Microsecond},
-			"Helios.TriggerMode{Period: 40ms, PulseLength: 3.5ms}",
+			"Helios.TriggerMode{Period: 40ms, PulseLength: 3.5ms, CameraDelay: 0s}",
 		},
 
 		{

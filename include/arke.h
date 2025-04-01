@@ -130,6 +130,7 @@ typedef struct ArkeHeliosSetPoint_t ArkeHeliosSetPoint;
 struct ArkeHeliosTriggerConfig_t {
 	uint16_t Period_hecto_us;
 	uint16_t Pulse_us;
+	int16_t  CameraDelay_us;
 } __attribute__((packed));
 
 struct ArkeCelaenoSetPoint_t {

@@ -68,23 +68,26 @@ func (m *HeliosPulseMode) String() string {
 type HeliosTriggerMode struct {
 	Period      time.Duration `positional-arg-name:"period" required:"yes"`
 	PulseLength time.Duration `positional-arg-name:"length" required:"yes"`
+	CameraDelay time.Duration `positional-arg-name:"delay" required:"no" default:"0s"`
 }
 
 func (m HeliosTriggerMode) Marshal(buf []byte) (int, error) {
-	if err := checkSize(buf, 4); err != nil {
+	if err := checkSize(buf, 6); err != nil {
 		return 0, err
 	}
 	binary.LittleEndian.PutUint16(buf[0:], uint16(m.Period.Microseconds()/100))
 	binary.LittleEndian.PutUint16(buf[2:], uint16(m.PulseLength.Microseconds()))
-	return 4, nil
+	binary.LittleEndian.PutUint16(buf[4:], uint16(m.CameraDelay.Microseconds()))
+	return 6, nil
 }
 
 func (m *HeliosTriggerMode) Unmarshal(buf []byte) error {
-	if err := checkSize(buf, 4); err != nil {
+	if err := checkSize(buf, 6); err != nil {
 		return err
 	}
 	m.Period = time.Duration(binary.LittleEndian.Uint16(buf[0:])) * 100 * time.Microsecond
 	m.PulseLength = time.Duration(binary.LittleEndian.Uint16(buf[2:])) * time.Microsecond
+	m.CameraDelay = time.Duration(int16(binary.LittleEndian.Uint16(buf[4:]))) * time.Microsecond
 	return nil
 }
 
@@ -93,7 +96,7 @@ func (m *HeliosTriggerMode) MessageClassID() MessageClass {
 }
 
 func (m *HeliosTriggerMode) String() string {
-	return fmt.Sprintf("Helios.TriggerMode{Period: %s, PulseLength: %s}", m.Period, m.PulseLength)
+	return fmt.Sprintf("Helios.TriggerMode{Period: %s, PulseLength: %s, CameraDelay: %s}", m.Period, m.PulseLength, m.CameraDelay)
 }
 
 func init() {

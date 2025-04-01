@@ -25,6 +25,7 @@ func (s *HeliosSuite) TestTriggerMode(c *C) {
 	checkMessageEncoding(c, &HeliosTriggerMode{
 		Period:      100 * time.Millisecond,
 		PulseLength: 3200 * time.Microsecond,
-	}, []byte{0xe8, 0x03, 0x80, 0x0c})
-	checkMessageLength(c, &HeliosTriggerMode{}, 4)
+		CameraDelay: -200 * time.Microsecond,
+	}, []byte{0xe8, 0x03, 0x80, 0x0c, 0x38, 0xff})
+	checkMessageLength(c, &HeliosTriggerMode{}, 6)
 }
