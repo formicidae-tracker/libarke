@@ -22,22 +22,28 @@ if(NOT ARKE_IS_IMPORTED)
 	enable_testing()
 
 	set(CMAKE_CTEST_COMMAND ctest -V)
-	add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-
-	find_path(GTEST_SRC_ROOT googletest/src/gtest-all.cc
-			  PATHS /usr/src/googletest
+	add_custom_target(
+		check COMMAND ${CMAKE_CTEST_COMMAND} ARGS --output-on-failure
 	)
 
-	if(NOT GTEST_SRC_ROOT)
-		message(FATAL_ERROR "Could not find gtest")
-	endif(NOT GTEST_SRC_ROOT)
+	include(FetchContent)
 
-	find_package(Threads REQUIRED)
+	FetchContent_Declare(
+		googletest
+		GIT_REPOSITORY https://github.com/google/googletest.git
+		GIT_TAG 9bb354fa8325fa31faa1e12627b25ab445e6eed3
+	)
+	# For Windows: Prevent overriding the parent project's compiler/linker
+	# settings
+	set(gtest_force_shared_crt
+		ON
+		CACHE BOOL "" FORCE
+	)
 
-	include_directories(${GTEST_SRC_ROOT}/googletest)
-	set(GTEST_SRC_FILE ${GTEST_SRC_ROOT}/googletest/src/gtest-all.cc)
+	FetchContent_MakeAvailable(googletest)
 
-	add_library(gtest ${GTEST_SRC_FILE})
+	include(GoogleTest)
+
 endif(NOT ARKE_IS_IMPORTED)
 
 add_subdirectory(src-c)

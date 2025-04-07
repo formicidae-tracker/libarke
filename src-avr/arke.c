@@ -312,16 +312,17 @@ yaacl_idt_t ArkeProcess(uint8_t * length) {
 	return toReturn;
 }
 
-
-#define implement_sender_function(name) \
-	ARKE_DECLARE_SENDER_FUNCTION(name) { \
-		txn->ID = arke.ID \
-			| ( Arke ## name ## ClassValue << 3) \
-			| ( (emergency ? ARKE_HIGH_PRIORITY_MESSAGE : ARKE_MESSAGE) << 9) ; \
-		txn->length = sizeof(Arke ## name); \
-		txn->data = (uint8_t*)data; \
-		return yaacl_send(txn); \
+#define implement_sender_function(name)                                        \
+	ARKE_DECLARE_SENDER_FUNCTION(name) {                                       \
+		txn->ID =                                                              \
+		    arke.ID | (Arke##name##ClassValue << 3) |                          \
+		    ((emergency ? ARKE_HIGH_PRIORITY_MESSAGE : ARKE_MESSAGE) << 9);    \
+		txn->length = sizeof(Arke##name);                                      \
+		txn->data   = (uint8_t *)data;                                         \
+		return yaacl_send(txn);                                                \
 	}
+
+// clang-format off
 
 implement_sender_function(ZeusSetPoint)
 implement_sender_function(ZeusReport)
@@ -333,11 +334,12 @@ implement_sender_function(HeliosSetPoint)
 implement_sender_function(CelaenoSetPoint)
 implement_sender_function(CelaenoStatus)
 implement_sender_function(CelaenoConfig)
+implement_sender_function(NotusSetPoint)
 
+    // clang-format on
 
-
-void ArkeReportError(ArkeError_t error) {
-	if ( FIFO_FULL(arke.errors) ) {
+    void ArkeReportError(ArkeError_t error) {
+	if (FIFO_FULL(arke.errors)) {
 		return;
 	}
 	FIFO_TAIL(arke.errors) = error;

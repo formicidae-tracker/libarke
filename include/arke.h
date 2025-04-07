@@ -174,6 +174,11 @@ struct ArkeNotusConfig_t {
 	uint8_t  MinFan, MaxHeat;
 } __attribute__((packed));
 
+struct ArkeNotusSetPoint_t {
+	uint8_t Power;
+} __attribute__((packed));
+typedef struct ArkeNotusSetPoint_t ArkeNotusSetPoint;
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus
